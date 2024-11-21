@@ -1,0 +1,27 @@
+<%- include("../layouts/user/header") %>
+<main class="main single-page" style="font-family: Arial, sans-serif; background-color: #f0f8ff; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <div class="container" style="background-color: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); padding: 20px; max-width: 600px;">
+        <div style="text-align: center; margin-bottom: 20px; max-width: 50%;">
+            <img src="https://eadn-wc01-5773915.nxedge.io/wp-content/uploads/2024/05/Refer-Earn-INR-%E2%82%B950000-and-more.png" alt="Refer a Friend" style="max-width: 100%; height: auto; border-radius: 10px;">
+        </div>
+        <h1 style="color: #333; font-size: 28px; text-align: center; margin-bottom: 15px;">Refer a Friend</h1>
+        <p style="color: #666; font-size: 16px; text-align: center; margin-bottom: 20px;">Share this link with your friends and earn amazing rewards!</p>
+        <div style="display: flex; margin-bottom: 15px;">
+            <input type="text" id="referralLink" value="http://localhost:3000/register?referral_code=<%= user_id %>" readonly style="flex-grow: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px 0 0 5px; font-size: 16px; height: 44px; box-sizing: border-box;">
+            <button onclick="copyLink()" style="background-color: #4CAF50; color: white; border: none; padding: 0 20px; cursor: pointer; border-radius: 0 5px 5px 0; font-size: 16px; height: 44px; display: flex; align-items: center; justify-content: center; font-family: Arial, sans-serif; font-weight: bold; text-align: center;">Copy Link</button>
+        </div>
+        <p style="color: #4CAF50; font-size: 14px; text-align: center; margin-top: 15px;">Earn 500 rupees for every friend who signs up!</p>
+    </div>
+</main>
+
+<script>
+function copyLink() {
+    var copyText = document.getElementById("referralLink");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    // alert("Referral link copied!");
+}
+</script>
+
+<%- include("../layouts/user/footer") %>

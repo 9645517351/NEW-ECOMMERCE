@@ -128,6 +128,33 @@
             </div>
         </div>
     </div>
+    <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <% if (currentPage > 0) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>">
+                            <i class="material-icons md-chevron_left"></i>
+                        </a>
+                    </li>
+                <% } %>
+    
+                <% for (let i = 0; i < totalPages; i++) { %>
+                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= (i + 1).toString().padStart(2, '0') %></a>
+                    </li>
+                <% } %>
+    
+                <% if (currentPage < totalPages - 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>">
+                            <i class="material-icons md-chevron_right"></i>
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+    </div>
 </section>
 
 <!-- Include jQuery -->
@@ -169,6 +196,8 @@
             });
         }
 
+
+        
         $(document).on('click', '.apply-offer-category', function (e) {
             e.preventDefault();
             selectedCategoryId = $(this).data('id');
@@ -179,21 +208,38 @@
             applyOffer();
         });
 
-        function applyOffer() {
-            const offerValue = $('#offerInput').val();
-            $.ajax({
-                url: `/admin/apply-offer/${selectedCategoryId}`,
-                type: 'POST',
-                data: { offer: offerValue },
-                success: function (result) {
-                    Swal.fire('Success!', 'Offer has been applied.', 'success');
-                    $('#offerModal').modal('hide');
-                },
-                error: function (err) {
-                    Swal.fire('Error!', 'Error applying offer.', 'error');
-                }
-            });
+
+
+    function applyOffer() {
+    const offerInput = $('#offerInput');
+    const offerValue = offerInput.val();
+
+    // Validate the offer value
+    if (!offerValue || isNaN(offerValue) || offerValue <= 0 || offerValue > 50) {
+        Swal.fire('Error!', 'Please enter a valid offer percentage between 1 and 50.', 'error');
+        return;
+    }
+
+    $.ajax({
+        url: `/admin/submitCategoryOffer/${selectedCategoryId}`,
+        type: 'POST',
+        data: { offer: offerValue },
+        success: function (result) {
+            Swal.fire('Success!', 'Offer has been applied.', 'success');
+            $('#offerModal').modal('hide');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        },
+        error: function (err) {
+            Swal.fire('Error!', 'Error applying offer.', 'error');
         }
+    });
+}
+
+
+
+
 
         $(document).on('click', '.remove-offer-category', function (e) {
             e.preventDefault();
@@ -203,11 +249,15 @@
 
         function removeOfferCategory() {
             $.ajax({
-                url: `/admin/remove-offer/${selectedCategoryId}`,
+                url: `/admin/removeCategoryOffer/${selectedCategoryId}`,
                 type: 'POST',
                 success: function (result) {
                     Swal.fire('Success!', 'Offer has been removed.', 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
                 },
+                
                 error: function (err) {
                     Swal.fire('Error!', 'Error removing offer.', 'error');
                 }
@@ -262,4 +312,5 @@
     });
 </script>
 
+    
 <%- include("../layouts/admin/footer") %>

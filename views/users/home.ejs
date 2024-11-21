@@ -90,7 +90,7 @@
             <div class="tab-content wow fadeIn animated" id="myTabContent">
                 <div class="tab-pane fade show active" id="tab-one" role="tabpanel" aria-labelledby="tab-one">
                     <div class="row product-grid-4">
-                        <% for( let i = 0; i < products.length; i++ ) { %>
+                        <% for( let i = 0; i < 8; i++ ) { %>
                             <div class="col-lg-3 col-md-4 col-12 col-sm-6">
                                 <div class="product-cart-wrap mb-30">
                                     <div class="product-img-action-wrap">
@@ -102,7 +102,7 @@
                                         </div>
                                         <div class="product-action-1">
                                             <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
-                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" href="shop-wishlist.html"><i class="fi-rs-heart"></i></a>
+                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addTowishlist('<%= products[i]._id %>')"><i class="fi-rs-heart"></i></a>
                                             <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
                                         </div>
                                         <div class="product-badges product-badges-position product-badges-mrg">
@@ -113,16 +113,23 @@
                                         <div class="product-category">
                                             <a href="shop-grid-right.html">Furniture</a>
                                         </div>
-                                        <h2><a href="shop-product-right.html"><%= products[i].productName%></a></h2>
+                                        <h2><a href="shop-product-right.html"><%= products[i].productName %></a></h2>
                                         
                                         <div class="product-price">
                                             <span>Rs :<%= products[i].salePrice %> </span>
                                             <span class="old-price"><%= products[i].regularPrice %></span>
                                         </div>
+                                        <div style="width: 50%;">
+                                            <label for="qty-<%= products[i]._id %>">Quantity:</label>
+                                            <input type="number" id="qty-<%= products[i]._id %>" name="quantity" min="1" value="1">
+                                        </div>
                                         <div class="product-action-1 show">
-                                            <a aria-label="Add To Cart" class="action-btn hover-up" href="shop-cart.html"><i class="fi-rs-shopping-bag-add"></i></a>
+                                            <a aria-label="Add To Cart" class="action-btn hover-up" onclick="addToCartDetails('<%= products[i]._id %>')" href="javascript:void(0);" id="cart-icon-<%= products[i]._id %>">
+                                                <i class="fi-rs-shopping-bag-add"></i>
+                                            </a>
                                         </div>
                                     </div>
+                                    
                                 </div>
                             </div>
                         <% } %>
@@ -447,5 +454,102 @@
         </div>
     </section> -->
      
+    <script>
+function addTowishlist(productId) {
+  console.log(productId);
+
+  $.ajax({
+    url: `/add-to-wishlist-icon?id=${productId}`,  // Check this URL
+    type: "PUT",
+    contentType: "application/json",
+    data: JSON.stringify({ is_blocked: true }),
+    success: function (response) {
+      updateCartNumber(response.count);
+
+      removeCartIcon(productId);
+    },
+    error: function (xhr, status, error) {
+      console.error("Failed to add to wishlist", error);
+    },
+  });
+
+  // Show SweetAlert at the center
+  Swal.fire({
+    position: "center",
+    icon: "success",
+    title: "Product added to wishlist!",
+    showConfirmButton: false,
+    timer: 1500,
+  }).then(() => {
+
+    window.location.href = "home";
+
+    });
+
+}
+
+
+
+function addToCartDetails(productId) {
+    const qtyInput = document.getElementById('qty-' + productId); // Ensure the element with a unique id exists
+    const qtyVal = parseInt(qtyInput.value); // Get the value of the input field as an integer
+
+    if (isNaN(qtyVal) || qtyVal <= 0) {
+        Swal.fire({
+            title: 'Error!',
+            text: 'Please enter a valid quantity greater than 0.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+        return; // Stop the function execution if validation fails
+    }
+
+
+    console.log(qtyVal, 'quantity');
+
+    fetch('/add-to-cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            productId: productId,
+            quantity: qtyVal
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Product Added Successfully',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = '/add-to-cart'; 
+            });
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: data.message,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'An unexpected error occurred.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    });
+}
+
+
+
+    </script>
 
 <%- include('../layouts/user/footer') -%> 

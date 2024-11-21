@@ -1,0 +1,226 @@
+<%- include("../layouts/admin/header") %>
+
+
+   
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <!-- Add your CSS files here -->
+    <link rel="stylesheet" href="path/to/your/css/style.css">
+</head>
+<body>
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Order detail</h2>
+                <p>Details for Order ID: <%= order._id %></p>
+            </div>
+        </div>
+        <div class="card">
+            <header class="card-header">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+                        <span>
+                            <i class="material-icons md-calendar_today"></i> <b><%= order.date %></b>
+                        </span> <br>
+                        <small class="text-muted">Order ID: <%= order._id.toString().slice(-5) %></small>
+                    </div>
+                </div>
+            </header> <!-- card-header end// -->
+            <div class="card-body">
+                <div class="row mb-50 mt-20 order-info-wrap">
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-person"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Customer</h6>
+                                <p class="mb-1">
+                                    <%= order.user.name %> <br> <template class="__cf_email__" data-cfemail="e2838e879aa2879a838f928e87cc818d8f"></template> <br> <%= order.user.mobile %>
+                                </p>
+                                <a href="#">View profile</a>
+                            </div>
+                        </article>  
+                    </div> <!-- col// -->
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-local_shipping"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Order info</h6>
+                                <p class="mb-1">
+                                    Shipping: MAHARAJA Express <br> Pay method: <%= order.payment %> <br> Status: <%= order.status %>
+                                </p>
+                                <a href="#">Download info</a>
+                            </div>
+                        </article>
+                    </div> <!-- col// -->
+                    <div class="col-md-4">
+                        <article class="icontext align-items-start">
+                            <span class="icon icon-sm rounded-circle bg-primary-light">
+                                <i class="text-primary material-icons md-place"></i>
+                            </span>
+                            <div class="text">
+                                <h6 class="mb-1">Deliver to</h6>
+                                <p class="mb-1">
+                                    City: <%= order.address.city %> <br><%= order.address.streetAddress %> <br> Po Box <%= order.address.zipCode %>
+                                </p>
+                                <a href="#">View profile</a>
+                            </div>
+                        </article>
+                    </div> <!-- col// -->
+                </div> <!-- row // -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                      <th width="30%">Product</th>
+                                      <th width="15%">Gross Amount</th>
+                                      <th width="15%">Quantity</th>
+                                      <th width="20%">Total</th>
+                                      <th width="20%" class="text-end">Action</th>
+                                    </tr>
+                                  </thead>
+
+                                <tbody>
+                                    <% let Subtotal = 0 %>
+                                    <% for(let i = 0; i < order.products.length; i++) { %>
+                                        <% let product = order.products[i]; %>
+                                        <tr>
+                                            <td>
+                                                <a class="itemside" href="#">
+                                                    <div class="left">
+                                                        <img src="/assets/uploads/<%= product.productId.image[0].filename %>" width="40" height="40" class="img-xs" alt="Item">
+                                                    </div>
+                                                    <div class="info"> <%= product.productId.productName %> </div>
+                                                </a>
+                                            </td>
+                                            <td class="align-middle">₹<%= product.productId.salePrice %></tdproduct.price>
+                                                <td class="align-middle"><%= product.quantity %></td>
+                                                <td class="text-end align-middle">₹<%= product.productId.salePrice * product.quantity %></td>
+                                                <% if (product.status === 'Failed') { %>
+                                                    <td class="text-end align-middle">
+                                                        <p>The product has failed.</p>
+                                                    </td>
+                                               
+                                                <% } else if (product.status !== 'Completed' && product.status !== 'Cancelled' && product.status !== 'Returned' && product.returnRequest !== 'Pending') { %>
+                                                        <td class="text-end align-middle">
+                                                            <form action="/admin/update-product-status/<%= product.productId._id %>/<%= order._id %>" method="post">
+                                                                <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200" name="newStatus">
+                                                                    <option value="Pending">Pending</option>
+                                                                    <option value="Cancelled">Cancelled</option>
+                                                                    <option value="Completed">Completed</option>
+                                                                </select>
+                                                                <button class="btn btn-primary" type="submit">Save</button>
+                                                            </form>
+                                                        </td>
+                                                        <% } else if (product.returnRequest === 'Pending') { %>
+                                                            <td class="text-end align-middle">
+                                                                <form action="/admin/handle-return-request/<%= product.productId._id %>/<%= order._id %>" method="post">
+                                                                    <select class="form-select d-inline-block mb-lg-0 mb-15 mw-200" name="returnAction">
+                                                                        <option value="Accept">Accept Return</option>
+                                                                        <option value="Reject">Reject Return</option>
+                                                                    </select>
+                                                                    <button class="btn btn-primary" type="submit">Process Return</button>
+                                                                </form>
+                                                            </td>
+                                                        
+                                                <% } else { %>
+                                                        <% if (!product.returnRequest) { %>
+                                                            <td class="text-end align-middle">
+                                                                <% if (product.status === 'Completed') { %>
+                                                                    <p>The product has been completed.</p>
+                                                                <% } else if (product.status === 'Cancelled') { %>
+                                                                    <p>The product has been cancelled.</p>
+                                                                <% } else if (product.status === 'Returned') { %>
+                                                                    <p>The product has been returned.</p>
+                                                                    <p>Return Reason: <%= product.returnReason %></p>
+                                                                <% } %>
+                                                            </td>
+                                                            <% } else { %>
+                                                                <td class="text-end align-middle">
+                                                                    <p>Return Request <%= product.returnRequest %></p>
+                                                                </td>
+                                                        <% } %>
+                                                <% } %>
+
+                                        </tr>
+                                        <% Subtotal += product.productId.salePrice * product.quantity %>
+                                    <% } %>
+                                
+                                    <tr>
+                                        <td colspan="5">
+                                            <article class="float-end">
+                                                <dl class="dlist">
+                                                    <dt>Subtotal:</dt>
+                                                    <dd>₹<%= subTotal %></dd>
+                                                </dl>
+                                                <dl class="dlist">
+                                                    <dt>Cancelled Product Price:</dt>
+                                                    <dd>
+                                                        <% if (canceledProductPrice) { %>
+                                                            <span class="value">-₹<%= canceledProductPrice %></span>
+                                                        <% } else { %>
+                                                            <span class="value">₹0</span>
+                                                        <% } %>
+                                                    </dd>
+                                                </dl>                                            
+                                                
+                                                <div class="dlist">
+                                                    <dt>Returned Product Price:</dt>
+                                                    <dd>
+                                                        <% if (returnedProductPrice) { %>
+                                                            <span class="value">-₹<%= returnedProductPrice %></span>
+                                                           <% } else { %>
+                                                            <span class="value">₹0</span>
+                                                           <% } %>
+                                                    </dd>
+                                                </div>
+                                                <% if (returnReasons.length > 0) { %>
+                                                    <div class="dlist">
+                                                        <dt>Return Reasons:</dt>
+                                                        <% returnReasons.forEach(reason => { %>
+                                                            <div style="margin-bottom: 10px;">
+                                                                <dd><%= reason.returnReason %> ,</dd>
+                                                            </div>
+                                                        <% }) %>
+                                                    </div>
+                                                <% } %>
+                                                <dl class="dlist">
+                                                    <dt>Discount Amount:</dt>
+                                                    <dd>₹<%= discountAmount %></dd>
+                                                </dl>
+                                                <dl class="dlist">
+                                                    <dt>Shipping cost:</dt>
+                                                    <dd>Free</dd>
+                                                </dl>
+                                                <dl class="dlist">
+                                                    <dt>Grand total:</dt>
+                                                    <dd> <b class="h5">₹<%= grandTotal %></b> </dd>
+                                                </dl>
+                                              </article>
+                                            </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div> <!-- table-responsive// -->
+                    </div> <!-- col// -->
+                    <div class="col-lg-1"></div>
+                    <div class="col-lg-4"></div> <!-- col// -->
+                </div> <!-- row end// -->
+            </div> <!-- card-body end// -->
+        </div> <!-- card end// -->
+    </section> <!-- content-main end// -->
+</body>
+</html>
+
+   
+
+    <%- include("../layouts/admin/footer") %>

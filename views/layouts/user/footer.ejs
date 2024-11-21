@@ -133,9 +133,73 @@
     <script src="assetsUser/js/plugins/jquery.theia.sticky.js"></script>
     <script src="assetsUser/js/plugins/jquery.elevatezoom.js"></script>
     <script src="validationlogin.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Template  JS -->
     <script src="./assetsUser/js/main.js?v=3.4"></script>
     <script src="./assetsUser/js/shop.js?v=3.4"></script>
+    
+<script>
+
+
+// Function to update wishlist count
+
+function updateWishlistCount() {
+    $.ajax({
+        url: '/api/wishlist/count', // Replace with your backend route for wishlist count
+        method: 'GET',
+        success: function(response) {
+            $('#wishlist-count').text(response.count);
+        },
+        error: function(error) {
+            console.error('Error fetching wishlist count:', error);
+        }
+    });
+}
+
+
+// Function to update cart count
+
+function updateCartCount() {
+    $.ajax({
+        url: '/api/cart/count', // Replace with your backend route for cart count
+        method: 'GET',
+        success: function(response) {
+            $('#cart-count').text(response.count);
+        },
+        error: function(error) {
+            console.error('Error fetching cart count:', error);
+        }
+    });
+}
+
+// Document ready function to initialize counts on page load
+$(document).ready(function() {
+    updateWishlistCount(); // Update wishlist count on page load
+    updateCartCount(); // Update cart count on page load
+});
+
+// Example: Trigger update counts after specific actions (e.g., adding/removing items)
+$('#add-to-cart-button').click(function() {
+    // Logic to add item to cart
+    $.ajax({
+        url: '/api/cart/add', // Replace with your backend route for adding item to cart
+        method: 'POST',
+        data: {
+
+        },
+        success: function(response) {
+            // If adding to cart was successful, update the cart count
+            updateCartCount();
+            window.location.reload();
+        },
+        error: function(error) {
+            console.error('Error adding item to cart:', error);
+        }
+    });
+});
+
+
+</script>
 
    
 </body>

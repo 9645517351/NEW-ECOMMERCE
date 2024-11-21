@@ -19,15 +19,15 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <% if (user.length > 0) { %>
-                                        <% for(let i = 0; i < user.length; i++) { %>
+                                    <% if (users.length > 0) { %>
+                                        <% for(let i = 0; i < users.length; i++) { %>
                                         <tr>
-                                            <td><a href="#" class="fw-bold"><%= user[i]._id %></a></td>
-                                            <td><%= user[i].name %></td>
-                                            <td><%= user[i].email %></td>
-                                            <td><%= user[i].mobile %></td>
-                                            <td id="<%= user[i]._id %>">
-                                                <a onclick="blockOrUnBlockUser('<%= user[i]._id %>')" class="btn btn-xs"><%= user[i].is_blocked ? " Unblock " : " Block " %></a>
+                                            <td><a href="#" class="fw-bold"><%= users[i]._id %></a></td>
+                                            <td><%= users[i].name %></td>
+                                            <td><%= users[i].email %></td>
+                                            <td><%= users[i].mobile %></td>
+                                            <td id="<%= users[i]._id %>">
+                                                <a onclick="blockOrUnBlockUser('<%= users[i]._id %>')" class="btn btn-xs"><%= users[i].is_blocked ? " Unblock " : " Block " %></a>
                                             </td>
                                         </tr>
                                         <% } %>
@@ -43,6 +43,35 @@
                     </div> <!-- table-responsive end// -->
                 </div>
             </div>
+
+            <div class="pagination-area mt-30 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <% if (currentPage > 0) { %>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<%= currentPage - 1 %>">
+                                    <i class="material-icons md-chevron_left"></i>
+                                </a>
+                            </li>
+                        <% } %>
+            
+                        <% for (let i = 0; i < totalPages; i++) { %>
+                            <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                <a class="page-link" href="?page=<%= i %>"><%= (i + 1).toString().padStart(2, '0') %></a>
+                            </li>
+                        <% } %>
+            
+                        <% if (currentPage < totalPages - 1) { %>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<%= currentPage + 1 %>">
+                                    <i class="material-icons md-chevron_right"></i>
+                                </a>
+                            </li>
+                        <% } %>
+                    </ul>
+                </nav>
+            </div>
+            
         </section>
         <div class="modal fade" id="blockConfirmationModal" tabindex="-1" aria-labelledby="blockConfirmationModalLabel" aria-hidden="true">
             <div class="modal-dialog">

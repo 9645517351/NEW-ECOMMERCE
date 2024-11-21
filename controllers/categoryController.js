@@ -1,12 +1,33 @@
 
 
 const Category = require("../models/categoryModel")
+const Product = require("../models/productModel")
+const User = require("../models/userModel")
+
 
 const loadCategoryManagement = async (req, res) => {
 
     try {
-        const category = await Category.find();
-        res.render('categoryManagement', { category })
+
+      const { page = 0 } = req.query;
+      const limit = 5; // Set the number of users to display per page
+  
+      const currentPage = parseInt(page);
+      const nextPage = currentPage + 1;
+
+      const totalCategories = await Category.countDocuments({})
+      const totalPages = Math.ceil(totalCategories  / limit);
+
+      const category = await Category.find({})
+        .skip(currentPage * limit)
+        .limit(limit);;
+
+      res.render('categoryManagement', { category ,
+        currentPage,
+        totalPages,
+        nextPage,
+        totalCategories
+      })
 
     } catch (error) {
         console.log(error.message);
@@ -125,9 +146,80 @@ const editCategory = async (req, res) => {
     }
 };
 
-// Assuming you are using a database like MongoDB with Mongoose
 
+const addCategoryOffer = async (req, res) => {
+    console.log('success.........');
+    try {
+      const {  offer } = req.body;
+      const {categoryId} = req.params;
+  
+      const categoryData = await Category.findById(categoryId);
+  
+      if (!categoryData) {
+        return res.status(404).json({ success: false, message: "Category not found" });
+      }
+  
+      const productCategory = await Product.find({ category : categoryId })
+      
+      for (const product of productCategory) {
+        const discountAmount = Math.floor(product.regularPrice * (offer / 100));
+        product.productOffer = discountAmount;
+        product.salePrice -= discountAmount; // Reduce from the current sale price
+        await product.save();
+      }
+      
+      categoryData.categoryOffer = offer;
+      await categoryData.save();
+  
+      return res.status(200).json({
+        success: true,
+        message: "Category offer successfully applied.",
+      });
+  
+    } catch (error) {
+  
+      console.error(error.message);
+  
+      return res.status(500).json({
+        success: false,
+        message: "Internal Server Error",
+      });
+  
+    }
+  
+  };
 
+  const removeCategoryOffer = async(req,res)=>{
+    try {
+        const {  offer } = req.body;
+        const {categoryId} = req.params;
+      
+      const category = await Category.findById(categoryId)
+  
+      if (!category) {
+        res.status(404).json({ success : false , message : "Category Not Found...!" })
+      }
+  
+  
+      const products = await Product.find({ category : categoryId })
+  
+      for(const product of products){
+  
+        product.salePrice = Number(product.productOffer) + Number(product.salePrice)
+        product.productOffer = 0
+        await product.save()
+      }
+      category.categoryOffer = 0
+      await category.save()
+      res.status(200).json({
+        success : true,
+        message : "Category Offer Removed Successfully..."
+      })
+      
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
 
 module.exports = {
@@ -136,5 +228,7 @@ module.exports = {
     addNewCategory,
     deleteCategory,
     editCategory,
+    addCategoryOffer,
+    removeCategoryOffer
     
 }

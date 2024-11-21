@@ -1,0 +1,192 @@
+<%- include("../layouts/admin/header") -%>
+
+<section class="content-main">
+  <div class="content-header">
+    <div>
+      <h2 class="content-title card-title">Sale Report </h2>
+      <p>Lorem ipsum dolor sit amet.</p>
+    </div>
+    <div>
+      <br>
+      <button onclick="downloadPDF()" id="downloadButton" class="btn btn-md rounded font-sm hover-up">Download PDF</button>
+    </div>
+  </div>
+  <div class="card mb-4">
+    <header class="card-header">
+      <div class="row gx-3">
+        <div class="col-lg-4 col-md-6 me-auto">
+          <div class="input-group">
+            <input type="text" id="orderSearchInput" placeholder="Search..." class="form-control" oninput="handleSearch()">
+          </div>
+        </div>
+        <div class="col-md-2 col-6">
+          <input
+            type="date"
+            id="startDate"
+            class="form-control"
+            value="<%= startDate ? startDate : '' %>"
+            onchange="updateSalesReport()"
+          />
+        </div>
+        <div class="col-md-2 col-6">
+          <input
+            type="date"
+            id="endDate"
+            class="form-control"
+            value="<%= endDate ? endDate : '' %>"
+            onchange="updateSalesReport()"
+          />
+        </div>
+        <div class="col-lg-2 col-6 col-md-3">
+          <select class="form-select">
+            <option>Status</option>
+            <option>Active</option>
+            <option>Disabled</option>
+            <option>Show all</option>
+          </select>
+        </div>
+        <div class="col-lg-2 col-6 col-md-3">
+          <select class="form-select">
+            <option>Show 20</option>
+            <option>Show 30</option>
+            <option>Show 40</option>
+          </select>
+        </div>
+      </div>
+    </header>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>ORDER ID</th>
+              <th scope="col">Date</th>
+              <th scope="col">Customer</th>
+              <th scope="col">Product</th>
+              <th scope="col">Quantity</th>
+              <th scope="col">Total</th>
+              <th scope="col">Status</th>
+              <th scope="col">Payment Method</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% orders.forEach(order => { %>
+              <% if (order.products.length > 0) { %>
+                <% order.products.forEach(product => { %>
+                  <% const currentProduct = product.productId; %>
+                  <tr>
+                    <td><%= order._id %></td>
+                    <td><%= new Date(order.date).toLocaleString() %></td>
+                    <td><%= order.user ? order.user.name : 'User not available' %></td>
+                    <td><%= currentProduct ? currentProduct.productName : 'Product not available' %></td>
+                    <td><%= product.quantity %></td>
+                    <td><%= order.totalPrice %></td>
+                    <td><span class="badge rounded-pill alert-success">Delivered</span></td>
+                    <td><%= order.payment %></td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td><%= order._id %></td>
+                  <td><%= new Date(order.date).toLocaleString() %></td>
+                  <td><%= order.user ? order.user.name : 'User not available' %></td>
+                  <td>Product not available</td>
+                  <td>0</td>
+                  <td><%= order.totalPrice %></td>
+                  <td><span class="badge rounded-pill alert-success">Delivered</span></td>
+                  <td><%= order.payment %></td>
+                </tr>
+              <% } %>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="pagination-area mt-15 mb-sm-5 mb-lg-0 text-center">
+    <nav aria-label="Page navigation example">
+      <ul class="pagination justify-content-center">
+        <% if (page > 1) { %>
+          <li class="page-item">
+            <a class="page-link" href="/admin/salesReport?page=<%= page - 1 %>&startDate=<%= startDate %>&endDate=<%= endDate %>">
+              <i class="material-icons md-chevron_left"></i>
+            </a>
+          </li>
+        <% } %>
+        <% for (let i = 1; i <= totalPages; i++) { %>
+          <li class="page-item <%= i === parseInt(page) ? 'active' : '' %>">
+            <a class="page-link" href="/admin/salesReport?page=<%= i %>&startDate=<%= startDate %>&endDate=<%= endDate %>">
+              <%= i %>
+            </a>
+          </li>
+        <% } %>
+        <% if (page < totalPages) { %>
+          <li class="page-item">
+            <a class="page-link" href="/admin/salesReport?page=<%= page + 1 %>&startDate=<%= startDate %>&endDate=<%= endDate %>">
+              <i class="material-icons md-chevron_right"></i>
+            </a>
+          </li>
+        <% } %>
+      </ul>
+    </nav>
+  </div>
+  
+  
+</section>
+
+<%- include("../layouts/admin/footer") %>
+
+
+
+<script>
+  function downloadPDF() {
+    // Make a request to the server to trigger the PDF download
+    fetch('/admin/download-pdf', {
+      method: 'GET',
+    })
+      .then((response) => {
+        if (response.ok) {
+          // If the response is successful, trigger the download
+          return response.blob();
+        } else {
+          // Handle error
+          throw new Error('Failed to fetch PDF');
+        }
+      })
+      .then((blob) => {
+        // Create a blob URL and trigger the download
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sales-report.pdf';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error(error.message);
+        // Handle error, e.g., show an alert to the user
+      });
+  }
+
+  function handleSearch() {
+    const searchValue = document.getElementById("orderSearchInput").value.toLowerCase();
+    const rows = document.querySelectorAll(".table tbody tr");
+
+    rows.forEach(row => {
+      const orderId = row.querySelector("td:first-child").textContent.toLowerCase();
+      const customerName = row.querySelector("td:nth-child(3)").textContent.toLowerCase();
+      const productName = row.querySelector("td:nth-child(4)").textContent.toLowerCase();
+
+      row.style.display = (orderId.includes(searchValue) || customerName.includes(searchValue) || productName.includes(searchValue)) ? "" : "none";
+    });
+  }
+
+  function updateSalesReport() {
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    const page = '<%= page %>'; // Assuming you have access to the current page
+    window.location.href = `/admin/salesReport?startDate=${startDate}&endDate=${endDate}&page=${page}`;
+  }
+</script>
