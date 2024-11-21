@@ -1,0 +1,262 @@
+<%- include("../layouts/admin/header") %>
+
+<section class="content-main">
+  <form action="/admin/products/create-edit-products?id=<%= product._id %>" method="post" enctype="multipart/form-data" onsubmit="return AddProductvalidate()">
+    <div class="row">
+      <div class="col-12">
+        <div class="content-header">
+          <h2 class="content-title">Edit Product</h2>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3">
+                <h6>General info</h6>
+              </div>
+              <div class="col-md-9">
+                <div class="mb-4">
+                  <label class="form-label">Product title</label>
+                  <input name="productName" type="text" placeholder="Type here" id="product_title" class="form-control" value="<%= product.productName %>">
+                  <p class="text-danger" id="nameError"></p>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label">Description</label>
+                  <textarea name="description" placeholder="Type here" id="prod_description" class="form-control" rows="4"><%= product.description %></textarea>
+                  <p class="text-danger" id="descError"></p>
+                </div>
+              </div>
+            </div>
+            <hr class="mb-4 mt-0">
+            <div class="row">
+              <div class="col-md-3">
+                <h6>2.1 Market Price</h6>
+              </div>
+              <div class="col-md-9">
+                <div class="mb-4">
+                  <label class="form-label">Cost in INR</label>
+                  <input name="marketPrice" type="text" placeholder="₹0.00" id="product_regPrice" class="form-control" value="<%= product.regularPrice %>">
+                  <p class="text-danger" id="regPriceError"></p>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3">
+                <h6>2.2 Sale Price</h6>
+              </div>
+              <div class="col-md-9">
+                <div class="mb-4">
+                  <label class="form-label">Cost in INR</label>
+                  <input name="salePrice" type="text" placeholder="₹0.00" id="product_salePrice" class="form-control" value="<%= product.salePrice %>">
+                  <p class="text-danger" id="salePriceError"></p>
+                </div>
+              </div>
+            </div>
+            <hr class="mb-4 mt-0">
+            <div class="row">
+              <div class="col-md-3">
+                <h6>3. Category</h6>
+              </div>
+              <div class="col-md-9">
+                <div class="mb-4">
+                  <% for(let i = 0; i < category.length; i++) { %>
+                    <label class="mb-2 form-check form-check-inline" style="width: 45%;">
+                      <input class="form-check-input" name="myCategory" type="radio" value="<%= category[i]._id %>" <% if (product.category.toString() === category[i]._id.toString()) { %> checked <% } %>>
+                      <span class="form-check-label"><%= category[i].categoryName %></span>
+                    </label>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <hr class="mb-4 mt-0">
+            <div class="row">
+              <div class="col-md-3">
+                <h6>4. Media</h6>
+              </div>
+              <div class="col-md-9">
+                <div class="mb-4">
+                  <label class="form-label">Images</label>
+                  <!-- Display existing images -->
+                  <div id="existingImagesContainer">
+                    <% for (let i = 0; i < product.image.length; i++) { %>
+                      <div data-filename="<%= product.image[i].filename %>" class="image-container" style="display: inline-block; position: relative; margin-right: 10px;">
+                        <img src="/assets/uploads/<%= product.image[i].filename %>" alt="Existing Image" class="existing-image" style="max-width: 100px; max-height: 100px;">
+                        <a href="#" onclick="deleteSingleImage('<%= product._id %>', '<%= product.image[i].filename %>'); return false;" style="position: absolute; top: 0; right: 0; background: red; color: white; padding: 5px; cursor: pointer;">
+                          <i class="fas fa-times delete-icon"></i>
+                        </a>
+                      </div>
+                    <% } %>
+                  </div>
+                  <!-- Input for adding or replacing images -->
+                  <input class="form-control" type="file" name="newImages" id="newImages" multiple>
+                  <input type="hidden" name="deletedImages" id="deletedImages">
+                  <div id="imagePreviewContainer" style="margin-top: 20px;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-3">
+                <h6>Quantity</h6>
+              </div>
+              <div class="col-md-9">
+                <div class="mb-4">
+                  <input name="quantity" type="number" placeholder="0" id="prod_stock" class="form-control" value="<%= product.quantity %>">
+                  <p class="text-danger" id="stockError"></p>
+                </div>
+              </div>
+              <div>
+                <button type="submit" class="btn btn-md rounded font-sm hover-up">Update product</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</section>
+
+<script>
+  let cropper;
+  const imagePreviewContainer = document.getElementById("imagePreviewContainer");
+  const newImagesInput = document.getElementById("newImages");
+
+  newImagesInput.addEventListener("change", function (event) {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        imagePreviewContainer.innerHTML = `<img id="imagePreview" src="${e.target.result}" style="max-width: 100%;">`;
+        const image = document.getElementById("imagePreview");
+        cropper = new Cropper(image, {
+          aspectRatio: 1,
+          viewMode: 3,
+          autoCropArea: 1,
+          responsive: true,
+          zoomable: true,
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  function deleteSingleImage(productId, filename) {
+    console.log('Product ID:', productId);
+    console.log('Filename:', filename);
+
+    let deletedImagesInput = document.getElementById("deletedImages");
+    let currentValue = deletedImagesInput.value;
+    if (currentValue) {
+      deletedImagesInput.value = currentValue + "," + filename;
+    } else {
+      deletedImagesInput.value = filename;
+    }
+
+    fetch(`/admin/products/delete-image/${productId}/${filename}`, {
+      method: "DELETE",
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        console.log(data);
+        if (data === "Image deleted successfully") {
+          const imageContainer = document.querySelector(`[data-filename="${filename}"]`);
+          if (imageContainer) {
+            imageContainer.remove();
+          }
+        } else {
+          alert("Error deleting image. Please try again.");
+        }
+      })
+      .catch((error) => console.error("Error:", error));
+  }
+
+  function AddProductvalidate() {
+    console.log('calling');
+    const productName = document.getElementById("product_title");
+    const regPrice = document.getElementById("product_regPrice");
+    const salePrice = document.getElementById("product_salePrice");
+    const description = document.getElementById("prod_description");
+    const stock = document.getElementById("prod_stock");
+
+    const productNameError = document.getElementById("nameError");
+    const regPriceError = document.getElementById("regPriceError");
+    const salePriceError = document.getElementById("salePriceError");
+    const descriptionError = document.getElementById("descError");
+    const stockError = document.getElementById("stockError");
+
+    const productNameRegex = /^[a-zA-Z0-9\s]+$/;
+    const regPriceRegex = /^\d+(\.\d{1,2})?$/;
+    const salePriceRegex = /^\d+(\.\d{1,2})?$/;
+    const descriptionRegex = /^[\p{L}\p{N}\s.,!?'"-/()]+$/u;
+    const stockRegex = /^[0-9]+$/;
+
+    let isValid = true;
+
+    if (productName.value.trim() === "") {
+      productNameError.innerHTML = "Product name is required";
+      setTimeout(() => { productNameError.innerHTML = ""; }, 5000);
+      isValid = false;
+    } else if (!productNameRegex.test(productName.value)) {
+      productNameError.innerHTML = "Invalid product name";
+      setTimeout(() => { productNameError.innerHTML = ""; }, 5000);
+      isValid = false;
+    }
+    else if (/\d/.test(productName.value)) {
+      productNameError.innerHTML = "Product name should not contain numbers";
+      setTimeout(() => { productNameError.innerHTML = ""; }, 5000);
+      isValid = false;
+    }
+
+    if (regPrice.value.trim() === "") {
+      regPriceError.innerHTML = "Regular price is required";
+      setTimeout(() => { regPriceError.innerHTML = ""; }, 5000);
+      isValid = false;
+    } else if (!regPriceRegex.test(regPrice.value)) {
+      regPriceError.innerHTML = "Invalid regular price";
+      setTimeout(() => { regPriceError.innerHTML = ""; }, 5000);
+      isValid = false;
+    }
+
+    if (salePrice.value.trim() === "") {
+      salePriceError.innerHTML = "Sale price is required";
+      setTimeout(() => { salePriceError.innerHTML = ""; }, 5000);
+      isValid = false;
+    } else if (!salePriceRegex.test(salePrice.value)) {
+      salePriceError.innerHTML = "Invalid sale price";
+      setTimeout(() => { salePriceError.innerHTML = ""; }, 5000);
+      isValid = false;
+    }
+
+    if (description.value.trim() === "") {
+      descriptionError.innerHTML = "Description is required";
+      setTimeout(() => { descriptionError.innerHTML = ""; }, 5000);
+      isValid = false;
+    } else if (!descriptionRegex.test(description.value)) {
+      descriptionError.innerHTML = "Only alphabets are allowed";
+      setTimeout(() => { descriptionError.innerHTML = ""; }, 5000);
+      isValid = false;
+    }
+
+    if (stock.value.trim() === "") {
+      stockError.innerHTML = "Stock quantity is required";
+      setTimeout(() => { stockError.innerHTML = ""; }, 5000);
+      isValid = false;
+    } else if (!stockRegex.test(stock.value)) {
+      stockError.innerHTML = "Invalid stock quantity";
+      setTimeout(() => { stockError.innerHTML = ""; }, 5000);
+      isValid = false;
+    } else if (parseInt(stock.value) < 0) {
+      stockError.innerHTML = "Stock quantity cannot be negative";
+      setTimeout(() => { stockError.innerHTML = ""; }, 5000);
+      isValid = false;
+    }
+
+    return isValid;
+  }
+</script>
+
+
+<%- include("../layouts/admin/footer") %>
