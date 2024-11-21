@@ -1,0 +1,148 @@
+<%- include("../layouts/admin/header") %>
+
+<section class="content-main">
+    <div class="row">
+        <div class="col-12">
+            <div class="content-header col-8">
+                <h2 class="content-title">Add New Coupon</h2>
+            </div>
+            <div class="col-lg-10">
+                <form action="/admin/add-new-coupon" method="post" onsubmit="return validateForm();">
+                    <div class="mb-4">
+                        <label for="couponName" class="form-label">Coupon name</label>
+                        <input type="text" placeholder="Type here" name="name" class="form-control"
+                            id="couponName">
+                        <p id="nameError" class="text-danger"></p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="couponDescription" class="form-label">Coupon code</label>
+                        <input type="text" placeholder="Type here" name="couponCode"
+                            class="form-control" id="couponDescription">
+                        <div>
+
+                            <% if (typeof message!=='undefined' ) { %>
+
+                                <%= message %>
+                                    <% console.log( message) %>
+
+                                        <% } %>
+                        </div>
+                        <p id="couponCodeError" class="text-danger"></p>
+
+                    </div>
+
+                    <div class="row gx-3">
+                        <div class="mb-4 col-md-6">
+                            <label for="percentageDiscount" class="form-label">Percentage
+                                Discount</label>
+                            <div class="input-group">
+                                <input type="number" placeholder="Type here" name="discount"
+                                    class="form-control" id="discount" step="0.01" min="0">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <p id="percentageDiscountError" class="text-danger"></p>
+                        </div>
+
+                        <div class="mb-4 col-md-6">
+                            <label for="minimumAmount" class="form-label">Minimum Amount</label>
+                            <input type="text" placeholder="Type here" name="minimumAmount"
+                                class="form-control" id="minimumAmount" step="0.01" min="0">
+                            <p id="minimumAmountError" class="text-danger"></p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="expiryDate" class="form-label">Expiry Date</label>
+                        <input type="date" placeholder="Type here" name="expiryDate"
+                            class="form-control" id="expiryDate">
+                        <p id="expiryDateError" class="text-danger"></p>
+                    </div>
+
+                    <button type="submit" class="btn btn-md rounded font-sm hover-up">Add
+                        Coupon</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function validateForm() {
+        var isValid = true;
+
+        // Reset errors
+        document.getElementById('nameError').textContent = '';
+        document.getElementById('couponCodeError').textContent = '';
+        document.getElementById('percentageDiscountError').textContent = '';
+        document.getElementById('minimumAmountError').textContent = '';
+        document.getElementById('expiryDateError').textContent = '';
+
+        // Get form values
+        var name = document.getElementById('couponName').value.trim();
+        var couponCode = document.getElementById('couponDescription').value.trim();
+        var discount = document.getElementById('discount').value.trim();
+        var minimumAmount = document.getElementById('minimumAmount').value.trim();
+        var expiryDate = document.getElementById('expiryDate').value.trim();
+
+        // Validate fields
+        var namePattern = /^[a-zA-Z0-9 ]+$/;
+        var codePattern = /^[a-zA-Z0-9]{6,12}$/;
+        var currentDate = new Date();
+        var expDate = new Date(expiryDate);
+
+        if (name === '') {
+            document.getElementById('nameError').textContent = 'Coupon name is required';
+            isValid = false;
+        } else if (!namePattern.test(name)) {
+            document.getElementById('nameError').textContent = 'Coupon name should be alphanumeric';
+            isValid = false;
+        }
+        if (couponCode === '') {
+            document.getElementById('couponCodeError').textContent = 'Coupon code is required';
+            isValid = false;
+        } else if (!codePattern.test(couponCode)) {
+            document.getElementById('couponCodeError').textContent = 'Coupon code should be 6-12 alphanumeric characters';
+            isValid = false;
+        }
+        if (discount === '' || parseFloat(discount) <= 0 || parseFloat(discount) > 100) {
+            document.getElementById('percentageDiscountError').textContent = 'Valid percentage discount (1-100) is required';
+            isValid = false;
+        }
+        if (minimumAmount === '' || parseFloat(minimumAmount) < 0) {
+            document.getElementById('minimumAmountError').textContent = 'Valid minimum amount is required';
+            isValid = false;
+        }
+        if (expiryDate === '') {
+            document.getElementById('expiryDateError').textContent = 'Expiry date is required';
+            isValid = false;
+        } else if (expDate <= currentDate) {
+            document.getElementById('expiryDateError').textContent = 'Expiry date should be a future date';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            swal.fire({
+                title: "Error",
+                text: "Please correct the errors in the form",
+                icon: "error",
+                button: "OK"
+            });
+        } else {
+            swal.fire({
+                title: "Success",
+                text: "Coupon added successfully",
+                icon: "success",
+                button: "OK"
+            }).then(function() {
+                document.querySelector('form').submit();
+            });
+        }
+
+        return isValid;
+    }
+</script>
+
+
+
+<%- include("../layouts/admin/footer") %>
