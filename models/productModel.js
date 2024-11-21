@@ -42,5 +42,9 @@ const productSchema = new mongoose.Schema({
         type:Number,
         default:0
     },
+    popularity:{
+        type:Number,
+        default:0
+    }
 })
 module.exports = mongoose.model("Products", productSchema);

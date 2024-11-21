@@ -34,6 +34,31 @@ app.use('/', userRoute);
 const adminRoute = require('./routes/adminRoute');
 app.use('/admin', adminRoute);
 
+// Error handling middleware 
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+
+    
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+        // Send JSON response for API requests
+        res.status(statusCode).json({
+            status: 'error',
+            statusCode,
+            message
+        });
+    } else {
+        
+        res.status(statusCode).render('error', {
+            statusCode,
+            message,
+            stack: process.env.NODE_ENV === 'development' ? err.stack : ''
+        });
+    }
+});
+
 app.get('/admin/*',adminController.notFoundPage)
 app.get('/*',userController.notFoundPage)
 

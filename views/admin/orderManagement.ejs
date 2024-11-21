@@ -1,0 +1,158 @@
+    <%- include("../layouts/admin/header")%>
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Order List </h2>
+            <p>Lorem ipsum dolor sit amet.</p>
+        </div>
+        <div>
+            <input type="text" placeholder="Search order ID" class="form-control bg-white">
+        </div>
+    </div>
+    <div class="card mb-4">
+        <header class="card-header">
+            <div class="row gx-3">
+                <div class="col-lg-4 col-md-6 me-auto">
+                    <input type="text" placeholder="Search..." class="form-control">
+                </div>
+                <div class="col-lg-2 col-6 col-md-3">
+                    <select class="form-select">
+                        <option>Order Status</option>
+                        <option>Active</option>
+                        <option>Disabled</option>
+                        <option>Show all</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-6 col-md-3">
+                    <select class="form-select">
+                        <option>Show 20</option>
+                        <option>Show 30</option>
+                        <option>Show 40</option>
+                    </select>
+                </div>
+            </div>
+        </header> <!-- card-header end// -->
+        <div class="card-body">
+            <div class="table-responsive">
+                <div class="table-responsive">
+                    <table class="table align-middle table-nowrap mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="align-middle" scope="col">Order ID</th>
+                                <th class="align-middle" scope="col">Billing Name</th>
+                                <th class="align-middle" scope="col">Date</th>
+                                <th class="align-middle" scope="col">Total</th>
+                                <th class="align-middle" scope="col">Payment Method</th>
+                                <th class="align-middle" scope="col">Order Status</th>
+                                <th class="align-middle" scope="col">View Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% order.forEach(orderItem => { %>
+                                <% 
+                                    // Determine displayStatus based on return and product status
+                                    let displayStatus;
+
+                                    // Check return request statuses first
+                                    if (orderItem.products.some(product => product.returnRequest === 'Rejected')) {
+                                        displayStatus = 'Return Request Rejected';
+                                    } else if (orderItem.products.some(product => product.returnRequest === 'Pending')) {
+                                        displayStatus = 'Return Request Pending';
+                                    } 
+                                    // Check if all products have the same status
+                                    else if (orderItem.products.every(product => product.status === 'Canceled')) {
+                                        displayStatus = 'Cancelled';
+                                    } else if (orderItem.products.every(product => product.status === 'Completed')) {
+                                        displayStatus = 'Completed';
+                                    } else if (orderItem.products.every(product => product.status === 'Returned')) {
+                                        displayStatus = 'Returned';
+                                    }
+                                    // Check for mixed states
+                                    else if (orderItem.products.some(product => 
+                                        product.status !== orderItem.products[0].status
+                                    )) {
+                                        displayStatus = 'Mixed';
+                                    }
+                                    // Fallback to order status
+                                    else {
+                                        displayStatus = orderItem.status;
+                                    }
+                                    
+                                    %>
+                        
+                                <tr class="<%= displayStatus === 'Failed' ? 'table-danger' : '' %>">
+                                    <td><a href="#" class="fw-bold">#<%= orderItem._id %></a></td>
+                                    <td><%= orderItem.user.name %></td>
+                                    <td><%= new Date(orderItem.date).toLocaleString() %></td>
+                                    <td>₹<%= orderItem.totalPrice %></td>  
+                                    <td><%= orderItem.payment %></td>
+                        
+                                    <td>
+                                        <% if (displayStatus === 'Pending') { %>
+                                            <span class="badge rounded-pill alert-warning">Pending</span>
+                                        <% } else if (displayStatus === 'Cancelled') { %>
+                                            <span class="badge rounded-pill alert-danger">Cancelled</span>
+                                        <% } else if (displayStatus === 'Return') { %>
+                                            <span class="badge rounded-pill alert-info">Return</span>
+                                        <% } else if (displayStatus === 'Completed') { %>
+                                            <span class="badge rounded-pill alert-success">Completed</span>
+                                        <% } else if (displayStatus === 'Failed') { %>
+                                            <span class="badge rounded-pill alert-danger">Failed</span>
+                                        <% } else if (displayStatus === 'Return Request Rejected') { %>
+                                            <span class="badge rounded-pill alert-danger">Return Request Rejected</span>
+                                        <% } else if (displayStatus === 'Return Request Pending') { %>
+                                            <span class="badge rounded-pill alert-warning">Return Request Pending</span>
+                                        <% } else if (displayStatus === 'Mixed') { %>
+                                            <span class="badge rounded-pill alert-info">Mixed</span>
+                                        <% } else { %>
+                                            <span class="badge rounded-pill alert-info"><%= displayStatus %></span>
+                                        <% } %>
+                                    </td>
+                        
+                                    <td class="text-end">
+                                        <a href="/admin/view-orderDetails/<%= orderItem._id %>" class="btn btn-md rounded font-sm">Detail</a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                        
+                    </table>
+                </div>
+            </div> <!-- table-responsive end// -->
+        </div>
+    </div> <!-- card end// -->
+    <div class="pagination-area mt-15 mb-50">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-start">
+          </ul>
+        </nav>
+      </div>
+      <div class="pagination-area mt-30 mb-50">
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-start">
+                <% if (currentPage > 0) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>">
+                            <i class="material-icons md-chevron_left"></i>
+                        </a>
+                    </li>
+                <% } %>
+    
+                <% for (let i = 0; i < totalPages; i++) { %>
+                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= (i + 1).toString().padStart(2, '0') %></a>
+                    </li>
+                <% } %>
+    
+                <% if (currentPage < totalPages - 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>">
+                            <i class="material-icons md-chevron_right"></i>
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+    </div>
+</section>
+<%- include("../layouts/admin/footer")%>

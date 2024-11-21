@@ -110,6 +110,7 @@
 
 <script>
     let cropperInstances = [];
+    let imageFiles = [];
 
     // Validate the form
     function validateForm() {
@@ -167,8 +168,7 @@
         }
 
         // Validate Images
-        const images = document.getElementById("images").files;
-        if (images.length === 0) {
+        if (imageFiles.length === 0) {
             document.getElementById("imageError").innerText = "At least one image is required.";
             isValid = false;
         }
@@ -224,9 +224,10 @@
         const previewContainer = document.getElementById("newImagesPreviewContainer");
         previewContainer.innerHTML = '';  // Clear previous previews
         cropperInstances = [];  // Reset cropper instances
+        imageFiles = Array.from(files); // Reset image files
 
         if (files && files.length > 0) {
-            Array.from(files).forEach(file => {
+            Array.from(files).forEach((file, index) => {
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     const img = document.createElement('img');
@@ -242,7 +243,22 @@
                     container.style.position = 'relative';
                     container.style.marginRight = '10px';
 
+                    const deleteButton = document.createElement('button');
+                    deleteButton.innerText = 'X';
+                    deleteButton.style.position = 'absolute';
+                    deleteButton.style.top = '2px';
+                    deleteButton.style.right = '2px';
+                    deleteButton.style.background = 'rgb(199, 22, 22)';
+                    deleteButton.style.color = 'white';
+                    deleteButton.style.border = 'square';
+                    deleteButton.style.fontSize = '10px';
+                    deleteButton.style.cursor = 'pointer';
+                    deleteButton.onclick = function () {
+                        deleteImage(index, container);
+                    };
+
                     container.appendChild(img);
+                    container.appendChild(deleteButton);
                     previewContainer.appendChild(container);
 
                     const cropper = new Cropper(img, {
@@ -262,12 +278,25 @@
         }
     });
 
+    function deleteImage(index, container) {
+        // Remove the cropper instance
+        cropperInstances[index].destroy();
+        cropperInstances.splice(index, 1);
+
+        // Remove the image file
+        imageFiles.splice(index, 1);
+
+        // Remove the image preview container
+        container.remove();
+    }
+
     function deleteSingleImage(productId, filename) {
         // Implement the deletion logic
         console.log('Deleting image:', filename);
     }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+
 
 
 <%- include("../layouts/admin/footer") %>

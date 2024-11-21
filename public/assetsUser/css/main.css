@@ -3698,6 +3698,21 @@ table .product-thumbnail img {
   right: 20px;
   font-weight: 300;
 }
+/* Add this to your CSS file */
+.button.out-of-stock {
+  background-color: rgb(196, 15, 15);
+  color: white;
+  cursor: not-allowed;
+}
+
+.text-danger {
+  color: rgb(198, 23, 23);
+}
+
+.text-success {
+  color: green;
+}
+
 
 .product-cart-wrap .product-content-wrap .add-to-cart:hover {
   background-color: #088178;
@@ -4116,6 +4131,281 @@ table .product-thumbnail img {
   background-color: #088178;
   color: #ffffff;
 }
+
+/*BADGE*/
+.badge[href]:focus,
+.badge[href]:hover {
+  color: #fff;
+}
+
+.badge.bg-primary[href]:focus,
+.badge.bg-primary[href]:hover {
+  background-color: #088178 !important;
+}
+
+.badge.bg-light {
+  color: #495057;
+}
+
+.badge.bg-light[href]:focus,
+.badge.bg-light[href]:hover {
+  color: #495057;
+}
+
+.badge-soft-primary {
+  color: #088178;
+  background-color: rgba(85, 230, 150, 0.18);
+}
+
+.badge-soft-primary[href]:focus,
+.badge-soft-primary[href]:hover {
+  color: #088178;
+  text-decoration: none;
+  background-color: rgba(85, 230, 150, 0.18);
+}
+
+.badge.bg-secondary[href]:focus,
+.badge.bg-secondary[href]:hover {
+  background-color: #6b6e82 !important;
+}
+
+.badge.bg-light {
+  color: #495057;
+}
+
+.badge.bg-light[href]:focus,
+.badge.bg-light[href]:hover {
+  color: #495057;
+}
+
+.badge-soft-secondary {
+  color: #74788d;
+  background-color: rgba(116, 120, 141, 0.18);
+}
+
+.badge-soft-secondary[href]:focus,
+.badge-soft-secondary[href]:hover {
+  color: #74788d;
+  text-decoration: none;
+  background-color: rgba(116, 120, 141, 0.4);
+}
+
+.badge.bg-success[href]:focus,
+.badge.bg-success[href]:hover {
+  background-color: #30b383 !important;
+}
+
+.badge.bg-light {
+  color: #495057;
+}
+
+.badge.bg-light[href]:focus,
+.badge.bg-light[href]:hover {
+  color: #495057;
+}
+
+.badge-soft-success {
+  color: #34c38f;
+  background-color: rgba(52, 195, 143, 0.18);
+}
+
+.badge-soft-success[href]:focus,
+.badge-soft-success[href]:hover {
+  color: #34c38f;
+  text-decoration: none;
+  background-color: rgba(52, 195, 143, 0.4);
+}
+
+.badge.bg-info[href]:focus,
+.badge.bg-info[href]:hover {
+  background-color: #3d9bef !important;
+}
+
+.badge.bg-light {
+  color: #495057;
+}
+
+.badge.bg-light[href]:focus,
+.badge.bg-light[href]:hover {
+  color: #495057;
+}
+
+.badge-soft-info {
+  color: #50a5f1;
+  background-color: rgba(80, 165, 241, 0.18);
+}
+
+.badge-soft-info[href]:focus,
+.badge-soft-info[href]:hover {
+  color: #50a5f1;
+  text-decoration: none;
+  background-color: rgba(80, 165, 241, 0.4);
+}
+
+.badge.bg-warning[href]:focus,
+.badge.bg-warning[href]:hover {
+  background-color: #f0ac39 !important;
+}
+
+.badge.bg-light {
+  color: #495057;
+}
+
+.badge.bg-light[href]:focus,
+.badge.bg-light[href]:hover {
+  color: #495057;
+}
+
+.badge-soft-warning {
+  color: #f1b44c;
+  background-color: rgba(241, 180, 76, 0.18);
+}
+
+.badge-soft-warning[href]:focus,
+.badge-soft-warning[href]:hover {
+  color: #f1b44c;
+  text-decoration: none;
+  background-color: rgba(241, 180, 76, 0.4);
+}
+
+.badge.bg-danger[href]:focus,
+.badge.bg-danger[href]:hover {
+  background-color: #f35757 !important;
+}
+
+.badge.bg-light {
+  color: #495057;
+}
+
+.badge.bg-light[href]:focus,
+.badge.bg-light[href]:hover {
+  color: #495057;
+}
+
+.badge-soft-danger {
+  color: #f46a6a;
+  background-color: rgba(244, 106, 106, 0.18);
+}
+
+.badge-soft-danger[href]:focus,
+.badge-soft-danger[href]:hover {
+  color: #f46a6a;
+  text-decoration: none;
+  background-color: rgba(244, 106, 106, 0.4);
+}
+
+.badge.bg-pink[href]:focus,
+.badge.bg-pink[href]:hover {
+  background-color: #e62c81 !important;
+}
+
+.badge.bg-light {
+  color: #495057;
+}
+
+.badge.bg-light[href]:focus,
+.badge.bg-light[href]:hover {
+  color: #495057;
+}
+
+.badge-soft-pink {
+  color: #e83e8c;
+  background-color: rgba(232, 62, 140, 0.18);
+}
+
+.badge-soft-pink[href]:focus,
+.badge-soft-pink[href]:hover {
+  color: #e83e8c;
+  text-decoration: none;
+  background-color: rgba(232, 62, 140, 0.4);
+}
+
+.badge.bg-light[href]:focus,
+.badge.bg-light[href]:hover {
+  background-color: #e1e7f0 !important;
+}
+
+.badge.bg-light {
+  color: #495057;
+}
+
+.badge.bg-light[href]:focus,
+.badge.bg-light[href]:hover {
+  color: #495057;
+}
+
+.badge-soft-light {
+  color: #eff2f7;
+  background-color: rgba(239, 242, 247, 0.18);
+}
+
+.badge-soft-light[href]:focus,
+.badge-soft-light[href]:hover {
+  color: #eff2f7;
+  text-decoration: none;
+  background-color: rgba(239, 242, 247, 0.4);
+}
+
+.badge.bg-dark[href]:focus,
+.badge.bg-dark[href]:hover {
+  background-color: #2b3035 !important;
+}
+
+.badge.bg-light {
+  color: #495057;
+}
+
+.badge.bg-light[href]:focus,
+.badge.bg-light[href]:hover {
+  color: #495057;
+}
+
+.badge-soft-dark {
+  color: #343a40;
+  background-color: rgba(52, 58, 64, 0.18);
+}
+
+.badge-soft-dark[href]:focus,
+.badge-soft-dark[href]:hover {
+  color: #343a40;
+  text-decoration: none;
+  background-color: rgba(52, 58, 64, 0.4);
+}
+
+.rounded-pill {
+  padding-right: .6em;
+  padding-left: .6em;
+}
+
+.badge.bg-dark {
+  color: #eff2f7;
+}
+
+.img-thumbnail {
+  padding: 0.25rem;
+  background-color: transparent;
+  border: none;
+  border-radius: 0.25rem;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  max-width: 100%;
+  height: auto;
+}
+.dlist {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.dlist .label {
+  font-weight: bold;
+  padding-right: 50px; /* Add padding to the right */
+}
+
+.dlist .value {
+  text-align: right;
+}
+
 
 /*Product list*/
 .product-list {

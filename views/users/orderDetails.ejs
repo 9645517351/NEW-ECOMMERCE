@@ -1,0 +1,411 @@
+
+
+<%- include("../layouts/user/header") -%>
+
+<section style="margin: 60px;" class="content-main">
+    <!-- Header Section -->
+
+    <!-- Order Detail Section -->
+    <div class="card">
+      <!-- Order Header -->
+      <header class="card-header">
+        <!-- Order Info -->
+        <div class="row align-items-center">
+          <div class="col-lg-6 col-md-6 mb-lg-0 mb-15">
+            <span>
+              <i class="material-icons md-calendar_today"></i> <b>
+                <%= order.createdOn %>
+              </b>
+            </span> <br>
+            <small class="text-muted">Order ID: <%= order._id %></small>
+          </div>
+          <div class="col-lg-6 col-md-6 ms-auto text-md-end">
+            <a class="btn btn-primary" href="/invoice?id=<%= order._id %>">invoice</a>
+
+            <a class="btn btn-primary" href="/profile">Save</a>
+
+          </div>
+        </div>
+      </header>
+
+      <!-- Order Body -->
+      <div class="card-body">
+        <!-- Customer Info -->
+        <div class="row mb-50 mt-20 order-info-wrap">
+          <!-- Customer Section -->
+          <div class="col-md-4">
+            <!-- Customer Card -->
+            <article class="icontext align-items-start">
+              <!-- Customer Icon -->
+              <span class="icon icon-sm rounded-circle bg-primary-light">
+                <i class="text-primary material-icons md-person"></i>
+              </span>
+
+              <!-- Customer Text -->
+              <div class="text">
+                <h6 class="mb-1">Customer</h6>
+                <p class="mb-1">
+                  <%= user.name %> <br>
+                    <a href="mailto:<%= user.email %>">
+                      <%= user.email %>
+                    </a> <br>
+                    +91 <%= user.mobile %>
+                </p>
+                <a href="#">View profile</a>
+              </div>
+            </article>
+          </div>
+
+          <!-- Order Information Section -->
+          <div class="col-md-4">
+            <!-- Order Information Card -->
+            <article class="icontext align-items-start">
+              <!-- Order Information Icon -->
+              <span class="icon icon-sm rounded-circle bg-primary-light">
+                <i class="text-primary material-icons md-local_shipping"></i>
+              </span>
+
+              <!-- Order Information Text -->
+              <div class="text">
+                <h6 class="mb-1">Order info</h6>
+                <p class="mb-1">
+                  Shipping: Fargo express <br>
+                  Pay method: <%= order.payment %> <br>
+                </p>
+                <a href="#">Download info</a>
+              </div>
+            </article>
+          </div>
+
+          <!-- Delivery Information Section -->
+          <div class="col-md-4">
+            <!-- Delivery Information Card -->
+            <article class="icontext align-items-start">
+              <!-- Delivery Information Icon -->
+              <span class="icon icon-sm rounded-circle bg-primary-light">
+                <i class="text-primary material-icons md-place"></i>
+              </span>
+
+              <!-- Delivery Information Text -->
+              <div class="text">
+                <h6 class="mb-1">Deliver to</h6>
+                <p class="mb-1">
+
+                  <%= order.address.streetAddress %> <br>
+                    <%= order.address.city %><br>
+                      <%= order.address.zipcode %>
+                </p>
+                <a href="#">View profile</a>
+              </div>
+            </article>
+          </div>
+        </div> <!-- row // -->
+
+        <!-- Order Products Table -->
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th width="30%">Product</th>
+                    <th width="15%">Gross Amount</th>
+                    <th width="15%">Quantity</th>
+                    <th width="20%">Total</th>
+                    <th width="20%" class="text-end">Action</th>
+                  </tr>
+                </thead>
+
+                <% 
+                // let subTotal = 0;
+                // let canceledProductPrice = 0;
+                // let returnedProductPrice = 0;
+                %>
+                <tbody>
+                  <!-- Loop through order products -->
+                  <% if (order && order.products && order.products.length > 0) { %>
+                      <% for (let i = 0; i < order.products.length; i++) { %>
+                          <% let product = order.products[i]; %>
+                          <tr>
+                            <td class="align-middle">
+                                <a class="itemside" href="#">
+                                    <div class="left">
+                                        <img src="/assets/uploads/<%= product.productId.image[0].filename %>" width="40" height="40" class="img-xs" alt="Item">
+                                    </div>
+                                    <div class="info">
+                                        <%= product.productId.productName %>
+                                    </div>
+                                </a>
+                            </td>
+                            <td class="align-middle">₹<%= product.productId.salePrice %></td>
+                                <td class="align-middle"><%= product.quantity %></td>
+                                <td class="text-end align-middle">₹<%= product.productId.salePrice * product.quantity %></td>
+                                <td class="text-end align-middle">
+                                    <% if (order.paymentStatus === "Failed") { %>
+                                        <button class="btn btn-warning btn-sm" onclick="retryPayment('<%= order._id %>')">Repay</button>
+                                    <% } else { %>
+                                        <% if (product.status === "Cancelled") { %>
+                                            <span class="badge-soft-danger">Cancelled</span>
+                                        <% } else if (product.returnRequest === "Pending") { %>
+                                            <span class="badge-soft-warning">Return Request Sent Successfully</span>
+                                        <% } else if (product.returnRequest === "Rejected") { %>
+                                            <span class="badge-soft-warning">Return Request Rejected</span>
+                                        <% } else if (product.status === "Returned") { %>
+                                            <span class="badge-soft-info">Returned</span>
+                                        <% } else { %>
+                                            <% if (product.status === "Pending" || product.status === "Processing" || product.status === "Shipped") { %>
+                                                <button class="btn btn-danger btn-sm" onclick="confirmCancelItem('<%= order._id %>', '<%= product._id %>')">Cancel Item</button>
+                                            <% } else if (product.status === "Completed" || product.status === "Partially Returned") { %>
+                                                <button class="btn btn-danger btn-sm" onclick="confirmReturnItem('<%= order._id %>', '<%= product._id %>')">Return Item</button>
+                                            <% } %>
+                                        <% } %>
+                                    <% } %>
+                                </td>
+                        </tr>
+                        
+                      <% } %>
+                      
+                      
+                      <tr>
+                          <td colspan="5">
+                              <div class="float-end">
+                                  <div class="dlist">
+                                      <span class="label">Subtotal:</span>
+                                      <span class="value">₹<%= subTotal %></span>
+                                  </div>
+                                  <div class="dlist">
+                                      <span class="label">Cancelled Product Price:</span>
+                                      <% if (canceledProductPrice) { %>
+                                       <span class="value">-₹<%= canceledProductPrice %></span>
+                                      <% } else { %>
+                                       <span class="value">₹0</span>
+                                      <% } %>
+                                  </div>
+
+                                  <div class="dlist">
+                                    <span class="label">Returned Product Price:</span>
+                                    <% if (returnedProductPrice) { %>
+                                     <span class="value">-₹<%= returnedProductPrice %></span>
+                                    <% } else { %>
+                                     <span class="value">₹0</span>
+                                    <% } %>
+                                </div>
+
+
+                                  <div class="dlist">
+                                      <span class="label">Discount Amount:</span>
+                                      <span class="value">₹<%= discountAmount %></span>
+                                  </div>
+                                  <div class="dlist">
+                                      <span class="label">Shipping cost:</span>
+                                      <span class="value">Free</span>
+                                  </div>
+                                  <div class="dlist">
+                                      <span class="label">Grand total:</span>
+                                      <span class="value"><b class="h5">₹<%= grandTotal %></b></span> 
+                                  </div>
+                                  
+                              </div>
+                          </td>
+                      </tr>
+                  <% } else { %>
+                      <tr>
+                          <td colspan="5">No products in this order</td>
+                      </tr>
+                  <% } %>
+              </tbody>
+              
+              
+              
+              </table>
+            </div> <!-- table-responsive// -->
+          </div> <!-- col// -->
+        </div> <!-- row // -->
+      </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+
+  </section>
+
+  <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Confirm Action</h5>
+        <button type="button" class="btn-close" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to cancel this item?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="closeBtn">Close</button>
+        <button type="button" class="btn btn-danger" id="confirmBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+
+  
+
+  <div class="modal" id="returnConfirmationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Return Confirmation</h5>
+          <button type="button" class="btn-close" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <textarea id="returnReason" placeholder="Enter return reason"></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="closeBtn">Close</button>
+          <button type="button" class="btn btn-danger" id="confirmReturnBtn">Confirm Return</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+<script>
+
+function confirmCancelItem(orderId, productId) {
+  const confirmationModal = new bootstrap.Modal(document.getElementById("confirmationModal"), {
+    backdrop: "static",
+    keyboard: false,
+  });
+
+  confirmationModal.show();
+  console.log(orderId, productId);
+
+  const cancelButton = document.getElementById("confirmBtn");
+
+  cancelButton.onclick = async function () {
+    try {
+      const response = await fetch(`/order-cancel/${orderId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productId: productId }),
+      });
+        
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Item cancelled successfully", responseData);
+
+        
+
+        cancelButton.textContent = "Item Canceled";
+        cancelButton.classList.remove("btn-danger");
+        cancelButton.classList.add("btn-success");
+
+        // Optionally disable the cancel button to prevent further clicks
+        cancelButton.disabled = true;
+
+        confirmationModal.hide();
+
+        // Reload the page to reflect the updated order status
+        location.reload();
+      } else {
+        const errorText = await response.text();
+        console.error(`Failed to cancel item. Status: ${response.status}, Error: ${errorText}`);
+        alert("Failed to cancel the item. Please try again.");
+      }
+    } catch (error) {
+      console.error('Error during fetch:', error);
+      alert("An error occurred while cancelling the item. Please try again.");
+    }
+  };
+
+  const closeButton = document.getElementById("closeBtn");
+  const closeIcon = document.querySelector('.btn-close');
+
+  closeButton.onclick = function () {
+    confirmationModal.hide();
+  };
+
+  closeIcon.onclick = function () {
+    confirmationModal.hide();
+  };
+}
+
+
+
+
+
+function confirmReturnItem(orderId, productId) {
+    const returnConfirmationModal = new bootstrap.Modal(document.getElementById("returnConfirmationModal"), {
+        backdrop: "static",
+        keyboard: false,
+    });
+
+    returnConfirmationModal.show();
+    console.log("Order ID:", orderId, "Product ID:", productId);
+
+    const confirmReturnButton = document.getElementById("confirmReturnBtn");
+    const closeButton = document.getElementById("closeBtn");
+    const closeIcon = document.querySelector('#returnConfirmationModal .btn-close');
+
+    const handleConfirmReturn = async () => {
+        const returnReason = document.getElementById("returnReason").value;
+        console.log("Return Reason:", returnReason);
+
+        try {
+            const response = await fetch(`/order-return/${orderId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ productId: productId, reason: returnReason }),
+            });
+
+            if (response.ok) {
+                const responseData = await response.json();
+                console.log("Item returned successfully:", responseData);
+
+                // Update the button text and styles
+                confirmReturnButton.textContent = "Item Returned";
+                confirmReturnButton.classList.remove("btn-danger");
+                confirmReturnButton.classList.add("btn-success");
+
+                confirmReturnButton.disabled = true;
+
+                // Hide the modal
+                returnConfirmationModal.hide();
+
+                // Reload the page to reflect the updated order status
+                location.reload();
+            } else {
+                const errorText = await response.text();
+                console.error(`Failed to return item. Status: ${response.status}, Error: ${errorText}`);
+                alert("Failed to return the item. Please try again.");
+            }
+        } catch (error) {
+            console.error('Error during fetch:', error);
+            alert("An error occurred while returning the item. Please try again.");
+        }
+    };
+
+    confirmReturnButton.onclick = handleConfirmReturn;
+    closeButton.onclick = () => returnConfirmationModal.hide();
+    closeIcon.onclick = () => returnConfirmationModal.hide();
+}
+
+
+function retryPayment(orderId) {
+    // Store orderId in sessionStorage for retrieval after payment
+    sessionStorage.setItem('failedOrderId', orderId);
+    window.location.href = `/add-to-cart?orderId=${orderId}`;
+}
+
+
+
+
+</script>
+
+
+<%- include("../layouts/user/footer") -%>

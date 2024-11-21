@@ -13,53 +13,34 @@
           <div class="row">
               <div class="col-lg-9">
                   <div class="shop-product-fillter">
-                      <div class="totall-product">
-                          <p> We found <strong class="text-brand">250</strong> items for you!</p>
-                      </div>
+                      
                       <div class="sort-by-product-area">
-                          <div class="sort-by-cover mr-10">
-                              <div class="sort-by-product-wrap">
-                                  <div class="sort-by">
-                                      <span><i class="fi-rs-apps"></i>Show:</span>
-                                  </div>
-                                  <div class="sort-by-dropdown-wrap">
-                                      <span> 50 <i class="fi-rs-angle-small-down"></i></span>
-                                  </div>
-                              </div>
-                              <div class="sort-by-dropdown">
-                                  <ul>
-                                      <li><a class="active" href="#">50</a></li>
-                                      <li><a href="#">100</a></li>
-                                      <li><a href="#">150</a></li>
-                                      <li><a href="#">200</a></li>
-                                      <li><a href="#">All</a></li>
-                                  </ul>
-                              </div>
-                          </div>
                           <div class="sort-by-cover">
-                              <div class="sort-by-product-wrap">
-                                  <div class="sort-by">
-                                      <span><i class="fi-rs-apps-sort"></i>Sort by:</span>
-                                  </div>
-                                  <div class="sort-by-dropdown-wrap">
-                                      <span> Featured <i class="fi-rs-angle-small-down"></i></span>
-                                  </div>
-                              </div>
-                              <div class="sort-by-dropdown">
-                                  <ul>
-                                      <li><a class="active" href="#">Featured</a></li>
-                                      <li><a href="#">Price: Low to High</a></li>
-                                      <li><a href="#">Price: High to Low</a></li>
-                                      <li><a href="#">Release Date</a></li>
-                                      <li><a href="#">Avg. Rating</a></li>
-                                  </ul>
-                              </div>
-                          </div>
+                            <div class="sort-by-product-wrap">
+                                <div class="sort-by">
+                                    <span><i class="fi-rs-apps-sort"></i>Sort by:</span>
+                                </div>
+                                <div class="sort-by-dropdown-wrap">
+                                    <span> <%= sort %> <i class="fi-rs-angle-small-down"></i></span>
+                                </div>
+                            </div>
+                            <div class="sort-by-dropdown">
+                                <ul>
+                                    <li><a class="<%= sort === 'popularity' ? 'active' : '' %>" href="/shop?category=<%= category %>&sort=popularity">Popularity</a></li>
+                                    <li><a class="<%= sort === 'price-asc' ? 'active' : '' %>" href="/shop?category=<%= category %>&sort=price-asc">Price: Low to High</a></li>
+                                    <li><a class="<%= sort === 'price-desc' ? 'active' : '' %>" href="/shop?category=<%= category %>&sort=price-desc">Price: High to Low</a></li>
+                                    <li><a class="<%= sort === 'average-ratings' ? 'active' : '' %>" href="/shop?category=<%= category %>&sort=average-ratings">Average Ratings</a></li>
+                                    <li><a class="<%= sort === 'new-arrivals' ? 'active' : '' %>" href="/shop?category=<%= category %>&sort=new-arrivals">New Arrivals</a></li>
+                                    <li><a class="<%= sort === 'a-z' ? 'active' : '' %>" href="/shop?category=<%= category %>&sort=a-z">A - Z</a></li>
+                                    <li><a class="<%= sort === 'z-a' ? 'active' : '' %>" href="/shop?category=<%= category %>&sort=z-a">Z - A</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
                       </div>
                   </div>
                   <div class="row product-grid-3">
                     <% for( let i = 0; i < products.length; i++ ) { %>
-                        <% if (products[i].quantity > 0) { %>
                       <div class="col-lg-4 col-md-4 col-12 col-sm-6">
                           <div class="product-cart-wrap mb-30">
                               <div class="product-img-action-wrap">
@@ -80,6 +61,9 @@
                                     </a>
                                   </div>
                                   <div class="product-action-1">
+                                    <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal">
+                                        <i class="fi-rs-search"></i>
+                                    </a>
                                     <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addTowishlist('<%= products[i]._id %>')">
                                         <i class="fi-rs-heart"></i>
                                     </a>
@@ -87,37 +71,53 @@
                                   
                               </div>
                               <div class="product-content-wrap">
-                                  
-                                  <h2><a href="/product-
-                                    
-                                    shop"><%= products[i].productName %></a></h2>
-                                  
-                                  <div class="product-price">
-                                      <span>₹<%= products[i].salePrice %> </span>
-                                     
-                                  </div>
-                                  <div class="product-action-1 show">
-                                      <button onclick="addToCart('<%= products[i]._id %>')" aria-label="Add To Cart" class="action-btn hover-up" href="/add-to-cart"><i class="fi-rs-shopping-bag-add" id="cart-icon-<%= products[i]._id %>" data-bs-toggle="tooltip"></i></button>
-                                  </div>
-                              </div>
+                                <h2><a href="/product-shop"><%= products[i].productName %></a></h2>
+                                <div class="product-price">
+                                    <span>₹<%= products[i].salePrice %> </span>
+                                </div>
+                                <div style="width: 50%;">
+                                    <label for="qty-<%= products[i]._id %>">Quantity:</label>
+                                    <input type="number" id="qty-<%= products[i]._id %>" name="quantity" min="1" value="1" oninput="validateQuantity('<%= products[i]._id %>')">
+                                </div>
+                                <div class="product-action-1 show">
+                                    <a aria-label="Add To Cart" class="action-btn hover-up" onclick="addToCartDetails('<%= products[i]._id %>')" href="javascript:void(0);" id="cart-icon-<%= products[i]._id %>"><i class="fi-rs-shopping-bag-add"></i></a>
+                                </div>
+                            </div>
+                            
+                            
                           </div>
                       </div>
                       <% } %>
-                    <% } %>
                   </div>  
                   <!--pagination-->
-                  <div class="pagination-area mt-15 mb-sm-5 mb-lg-0">
-                      <nav aria-label="Page navigation example">
-                          <ul class="pagination justify-content-start">
-                              <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                              <li class="page-item"><a class="page-link" href="#">02</a></li>
-                              <li class="page-item"><a class="page-link" href="#">03</a></li>
-                              <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                              <li class="page-item"><a class="page-link" href="#">16</a></li>
-                              <li class="page-item"><a class="page-link" href="#"><i class="fi-rs-angle-double-small-right"></i></a></li>
-                          </ul>
-                      </nav>
-                  </div>
+                  <div class="pagination-area mt-30 mb-50">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination justify-content-start">
+                            <% if (currentPage > 0) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<%= currentPage - 1 %>&sort=<%= sort %>">
+                                        <i class="material-icons">chevron_left</i>
+                                    </a>
+                                </li>
+                            <% } %>
+                        
+                            <% for (let i = 0; i < totalPages; i++) { %>
+                                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                    <a class="page-link" href="?page=<%= i %>&sort=<%= sort %>"><%= (i + 1).toString().padStart(2, '0') %></a>
+                                </li>
+                            <% } %>
+                        
+                            <% if (currentPage < totalPages - 1) { %>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=<%= currentPage + 1 %>&sort=<%= sort %>">
+                                        <i class="material-icons">chevron_right</i>
+                                    </a>
+                                </li>
+                            <% } %>
+                        </ul>
+                    </nav>
+                </div>
+                
               </div>
               <div class="col-lg-3 primary-sidebar sticky-sidebar">
                   <div class="row">
@@ -134,4 +134,148 @@
   </section>
 </main>
     <!-- Vendor JS-->
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+
+function addTowishlist(productId) {
+  console.log(productId);
+
+  $.ajax({
+    url: `/add-to-wishlist-icon?id=${productId}`,  // Check this URL
+    type: "PUT",
+    contentType: "application/json",
+    data: JSON.stringify({ is_blocked: true }),
+    success: function (response) {
+      updateCartNumber(response.count);
+
+      removeCartIcon(productId);
+    },
+    error: function (xhr, status, error) {
+      console.error("Failed to add to wishlist", error);
+    },
+  });
+
+  // Show SweetAlert at the center
+  Swal.fire({
+    position: "center",
+    icon: "success",
+    title: "Product added to wishlist!",
+    showConfirmButton: false,
+    timer: 1500,
+  }).then(() => {
+                window.location.href = "/shop"; 
+            });
+}
+
+
+
+function addToCartDetails(productId) {
+    const qtyInput = document.getElementById('qty-' + productId); // Ensure the element with a unique id exists
+    const qtyVal = parseInt(qtyInput.value); // Get the value of the input field as an integer
+
+    if (isNaN(qtyVal) || qtyVal <= 0) {
+        Swal.fire({
+            title: 'Error!',
+            text: 'Please enter a valid quantity greater than 0.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+        return; // Stop the function execution if validation fails
+    }
+
+
+    console.log(qtyVal, 'quantity');
+
+    fetch('/add-to-cart', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            productId: productId,
+            quantity: qtyVal
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Product Added Successfully',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = '/add-to-cart'; 
+            });
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: data.message,
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'An unexpected error occurred.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });             
+    });
+}
+
+const MAX_QUANTITY_PER_PERSON = 10;
+
+function validateQuantity(productId) {
+    var qtyInput = document.getElementById('qty-' + productId);
+    var qty = parseInt(qtyInput.value);
+    
+    if (qty > MAX_QUANTITY_PER_PERSON) {
+        Swal.fire({
+            title: 'Error!',
+            text: `You cannot add more than ${MAX_QUANTITY_PER_PERSON} of this product to the cart.`,
+            icon: 'error',
+            confirmButtonText: 'OK'
+        }).then(() => {
+            qtyInput.value = MAX_QUANTITY_PER_PERSON; 
+        });
+    }
+}
+
+
+
+document.querySelectorAll('.increment-button').forEach(button => {
+    button.addEventListener('click', (event) => {
+        event.preventDefault();
+        const productId = button.getAttribute('data-product-id');
+        const index = button.getAttribute('data-index');
+        updateQuantity('qtyInc', productId, index);
+    });
+});
+
+document.querySelectorAll('.decrement-button').forEach(button => {
+    button.addEventListener('click', (event) => {
+        event.preventDefault();
+        const productId = button.getAttribute('data-product-id');
+        const index = button.getAttribute('data-index');
+        updateQuantity('qtyDec', productId, index);
+    });
+});
+
+document.querySelector('.button-add-to-cart').addEventListener('click', (event) => {
+    event.preventDefault();
+    const productId = '<%= products._id %>';
+    addToCartDetails(productId);
+});
+
+</script>
+
+
+    
     <%- include("../layouts/user/footer") -%>

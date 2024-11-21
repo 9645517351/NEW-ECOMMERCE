@@ -26,9 +26,15 @@ const adminController = require('../controllers/adminController')
 const productController = require("../controllers/productController")
 const categoryController = require('../controllers/categoryController')
 const adminAuth = require('../middleware/adminAuth')
+const orderController = require('../controllers/orderController')
+
+
  
 admin_route.get('/',adminAuth.isLogin,adminController.loadLogin)
 admin_route.post('/',adminAuth.isLogin,adminController.verifyLogin)
+admin_route.get('/salesReport',adminAuth.isLogin,adminController.salesReport)
+admin_route.get('/sales-data',adminAuth.isLogin,adminController.saleChart)
+
 
 admin_route.get('/home',adminAuth.isLogin,adminController.loadDashboard)
 admin_route.get('/user-management',adminAuth.isLogin,adminController.loadUserManagement)
@@ -44,15 +50,17 @@ admin_route.post(
     config.upload.fields(uploadFields.map(field => ({ name: field, maxCount: 10 }))),
     productController.createNewProduct
 );
-
-admin_route.get('/product-search',productController.searchProduct)
-    
+admin_route.get('/product-search',productController.searchProduct)   
 admin_route.get('/delete-product',adminAuth.isLogin,productController.deleteProduct)
 admin_route.get('/products/create-edit-products',adminAuth.isLogin,productController.loadeditProduct)    
 admin_route.post('/products/create-edit-products',
 config.upload.array("newImages", 10),adminAuth.isLogin,productController.UpdateCreateEditProduct)    
 
 admin_route.delete('/products/delete-image/:productId/:filename',adminAuth.isLogin, productController.deleteImage);
+admin_route.put('/submitOffer',adminAuth.isLogin,productController.addProductOffer)
+admin_route.put("/removeProductOffer",adminAuth.isLogin,productController.removeOffer)
+
+
 
 
 admin_route.get('/category-management',adminAuth.isLogin,categoryController.loadCategoryManagement)
@@ -60,6 +68,8 @@ admin_route.get('/add-New-Category',adminAuth.isLogin,categoryController.loadAdd
 admin_route.post('/add-New-Category',adminAuth.isLogin,categoryController.addNewCategory)
 admin_route.post('/edit-category/:categoryId',adminAuth.isLogin,categoryController.editCategory)
 admin_route.delete('/delete-category/:categoryId',adminAuth.isLogin,categoryController.deleteCategory)
+admin_route.post('/submitCategoryOffer/:categoryId',adminAuth.isLogin,categoryController.addCategoryOffer)
+admin_route.post('/removeCategoryOffer/:categoryId',adminAuth.isLogin,categoryController.removeCategoryOffer)
 
 
 
@@ -71,6 +81,13 @@ admin_route.post('/add-new-coupon',adminAuth.isLogin,couponController.createCoup
 admin_route.get('/edit-coupon',adminAuth.isLogin,couponController.loadEditCoupon)
 admin_route.post('/edit-coupon',adminAuth.isLogin,couponController.editCoupon)
 admin_route.delete('/coupons/delete-coupon/:id',adminAuth.isLogin,couponController.deleteCoupon)
+
+admin_route.get('/products/products-oders',adminAuth.isLogin, orderController.loadAdminOrderManagement)
+admin_route.get('/view-orderDetails/:orderId',adminAuth.isLogin, orderController.loadAdnimOrderveiw)
+admin_route.post('/update-product-status/:productId/:orderId',adminAuth.isLogin,orderController.adminUpdateProductStatus)
+admin_route.post("/handle-return-request/:productId/:orderId",adminAuth.isLogin,orderController.handleReturnRequest)
+
+admin_route.get('/download-pdf',adminAuth.isLogin,adminController.downloadSalesPdf)
 
 
 module.exports = admin_route;

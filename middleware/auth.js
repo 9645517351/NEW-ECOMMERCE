@@ -1,6 +1,6 @@
 const isLogin = async (req, res, next) => {
   try {
-    if (req.session.user_id) {
+    if (req.session.user_id ) {
       next(); // Proceed to the next middleware/route handler
     } else if(req.session.isAdmin) {
       res.redirect("/admin/home");

@@ -31,12 +31,10 @@
                             <th>#ID</th>
                             <th>Name</th>
                             <th>code</th>
-
                             <th>Offer Price</th>
-
                             <th>Minimum Amount</th>
+                            <th>Maximum Amount</th>
                             <th>Created Date</th>
-
                             <th> Expiry Date</th>
                             <th class="text-end">Action</th>
                         </tr>
@@ -58,11 +56,15 @@
                                             <%=coupon[i].code %>
                                         </b></td>
                                     <td>
-                                        <%=coupon[i].discount %>%
+                                      <%=coupon[i].discount %>
                                     </td>
                                     <td>
                                         <%=coupon[i].minimumAmount %>
                                     </td>
+                                    <td>
+                                        <%= coupon[i].maximumAmount %>
+                                    </td>
+                                    
                                     <td>
                                         <%=coupon[i].createdOn.toLocaleDateString() %>
                                     </td>
@@ -88,6 +90,33 @@
         <!-- card-body end// -->
 
     </div>
+    <div class="pagination-area mt-30 mb-50">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-start">
+          <% if (currentPage > 0) { %>
+              <li class="page-item">
+                  <a class="page-link" href="?page=<%= currentPage - 1 %>">
+                      <i class="material-icons md-chevron_left"></i>
+                  </a>
+              </li>
+          <% } %>
+
+          <% for (let i = 0; i < totalPages; i++) { %>
+              <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                  <a class="page-link" href="?page=<%= i %>"><%= (i + 1).toString().padStart(2, '0') %></a>
+              </li>
+          <% } %>
+
+          <% if (currentPage < totalPages - 1) { %>
+              <li class="page-item">
+                  <a class="page-link" href="?page=<%= currentPage + 1 %>">
+                      <i class="material-icons md-chevron_right"></i>
+                  </a>
+              </li>
+          <% } %>
+      </ul>
+      </nav>
+  </div>
 
 </section>
 <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
@@ -153,6 +182,7 @@ function validateForm() {
   const couponCode = document.getElementById('couponDescription').value.trim();
   const discount = document.getElementById('discount').value.trim();
   const minimumAmount = document.getElementById('minimumAmount').value.trim();
+  const maximumAmount = document.getElementById('maximumAmount').value.trim();
   const expiryDate = document.getElementById('expiryDate').value.trim();
 
   let isValid = true; // Assume the form is valid by default
@@ -178,6 +208,12 @@ function validateForm() {
   // Validation for Minimum Amount
   if (!/^\d+(\.\d{1,2})?$/.test(minimumAmount) || parseFloat(minimumAmount) < 0) {
       displayErrorMessage('minimumAmountError', 'Please enter a valid non-negative minimum amount.');
+      isValid = false;
+  }
+
+  // Validation for Maximum Amount
+  if (!/^\d+(\.\d{1,2})?$/.test(maximumAmount) || parseFloat(maximumAmount) < 0) {
+      displayErrorMessage('maximumAmountError', 'Please enter a valid non-negative maximum amount.');
       isValid = false;
   }
 
@@ -212,6 +248,7 @@ function createCoupon() {
     description: document.getElementById("couponDescription").value.trim(),
     discountAmount: document.getElementById("offerPrice").value.trim(),
     minimumPurchase: document.getElementById("minimumAmount").value.trim(),
+    maximumPurchase: document.getElementById("maximumAmount").value.trim(),
     expirationDate: document.getElementById("expiryDate").value.trim(),
   };
   const endpoint = "/admin/coupons/add-new-coupon";
@@ -242,6 +279,7 @@ function resetForm() {
   document.getElementById("couponDescription").value = "";
   document.getElementById("offerPrice").value = "";
   document.getElementById("minimumAmount").value = "";
+  document.getElementById("maximumAmount").value = "";
   document.getElementById("expiryDate").value = "";
 }
 
@@ -261,6 +299,7 @@ function createCoupon() {
     description: document.getElementById("couponDescription").value.trim(),
     discountAmount: document.getElementById("offerPrice").value.trim(),
     minimumPurchase: document.getElementById("minimumAmount").value.trim(),
+    maximumPurchase: document.getElementById("maximumAmount").value.trim(),
     expirationDate: document.getElementById("expiryDate").value.trim(),
   };
   const endpoint = "/admin/coupons/add-new-coupon";
@@ -293,6 +332,7 @@ function updateCoupon(couponId) {
     description: document.getElementById("couponDescription").value.trim(),
     discountAmount: document.getElementById("offerPrice").value.trim(),
     minimumPurchase: document.getElementById("minimumAmount").value.trim(),
+    maximumPurchase: document.getElementById("maximumAmount").value.trim(),
     expirationDate: document.getElementById("expiryDate").value.trim(),
   };
   const endpoint = `/admin/coupons/edit-coupon`;
@@ -327,6 +367,7 @@ function validateFormUpdate() {
   const description = document.getElementById("couponDescription").value.trim();
   const offerPrice = document.getElementById("offerPrice").value.trim();
   const minimumAmount = document.getElementById("minimumAmount").value.trim();
+  const maximumAmount = document.getElementById("maximumAmount").value.trim();
   const expiryDate = document.getElementById("expiryDate").value.trim();
 
   let isValid = true;
@@ -359,6 +400,18 @@ function validateFormUpdate() {
     displayErrorMessage(
       "minimumAmountError",
       "Please enter a valid non-negative minimum amount."
+    );
+    isValid = false;
+  }
+
+  // Validation for Maximum Amount
+  if (
+    !/^\d+(\.\d{1,2})?$/.test(maximumAmount) ||
+    parseFloat(maximumAmount) < 0
+  ) {
+    displayErrorMessage(
+      "maximumAmountError",
+      "Please enter a valid non-negative maximum amount."
     );
     isValid = false;
   }
@@ -446,6 +499,7 @@ function confirmCouponDelete(couponId) {
         deleteButton.removeEventListener("click", handleDelete); // Remove event listener
     });
 }
+
 
 function deleteCoupon(apiEndpoint, couponId) {
     fetch(apiEndpoint, {

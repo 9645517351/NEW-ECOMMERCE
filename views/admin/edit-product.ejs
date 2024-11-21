@@ -13,6 +13,7 @@
       <div class="col-lg-12">
         <div class="card mb-4">
           <div class="card-body">
+            <!-- General Info -->
             <div class="row">
               <div class="col-md-3">
                 <h6>General info</h6>
@@ -30,6 +31,7 @@
                 </div>
               </div>
             </div>
+            <!-- Market Price -->
             <hr class="mb-4 mt-0">
             <div class="row">
               <div class="col-md-3">
@@ -43,6 +45,7 @@
                 </div>
               </div>
             </div>
+            <!-- Sale Price -->
             <div class="row">
               <div class="col-md-3">
                 <h6>2.2 Sale Price</h6>
@@ -55,6 +58,7 @@
                 </div>
               </div>
             </div>
+            <!-- Category -->
             <hr class="mb-4 mt-0">
             <div class="row">
               <div class="col-md-3">
@@ -71,6 +75,7 @@
                 </div>
               </div>
             </div>
+            <!-- Media -->
             <hr class="mb-4 mt-0">
             <div class="row">
               <div class="col-md-3">
@@ -84,8 +89,8 @@
                     <% for (let i = 0; i < product.image.length; i++) { %>
                       <div data-filename="<%= product.image[i].filename %>" class="image-container" style="display: inline-block; position: relative; margin-right: 10px;">
                         <img src="/assets/uploads/<%= product.image[i].filename %>" alt="Existing Image" class="existing-image" style="max-width: 100px; max-height: 100px;">
-                        <a href="#" onclick="deleteSingleImage('<%= product._id %>', '<%= product.image[i].filename %>'); return false;" style="position: absolute; top: 0; right: 0; background: red; color: white; padding: 5px; cursor: pointer;">
-                          <i class="fas fa-times delete-icon"></i>
+                        <a href="#" onclick="deleteSingleImage('<%= product._id %>', '<%= product.image[i].filename %>'); return false;" style="position: absolute; top: 0; right: 0; background: rgb(199, 22, 22); color: white; padding: 2.5px; cursor: pointer; text-align: center; width: 20px; height: 20px; line-height: 20px; font-size: 14px;">
+                          X
                         </a>
                       </div>
                     <% } %>
@@ -97,6 +102,7 @@
                 </div>
               </div>
             </div>
+            <!-- Quantity -->
             <div class="row">
               <div class="col-md-3">
                 <h6>Quantity</h6>
@@ -107,9 +113,10 @@
                   <p class="text-danger" id="stockError"></p>
                 </div>
               </div>
-              <div>
-                <button type="submit" class="btn btn-md rounded font-sm hover-up">Update product</button>
-              </div>
+            </div>
+            <!-- Submit Button -->
+            <div>
+              <button type="submit" class="btn btn-md rounded font-sm hover-up">Update product</button>
             </div>
           </div>
         </div>
@@ -119,29 +126,29 @@
 </section>
 
 <script>
-  let cropper;
-  const imagePreviewContainer = document.getElementById("imagePreviewContainer");
-  const newImagesInput = document.getElementById("newImages");
+//  let cropper;
+//   const imagePreviewContainer = document.getElementById("imagePreviewContainer");
+//   const newImagesInput = document.getElementById("newImages");
 
-  newImagesInput.addEventListener("change", function (event) {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        imagePreviewContainer.innerHTML = `<img id="imagePreview" src="${e.target.result}" style="max-width: 100%;">`;
-        const image = document.getElementById("imagePreview");
-        cropper = new Cropper(image, {
-          aspectRatio: 1,
-          viewMode: 3,
-          autoCropArea: 1,
-          responsive: true,
-          zoomable: true,
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  });
+//   newImagesInput.addEventListener("change", function (event) {
+//     const files = event.target.files;
+//     if (files && files.length > 0) {
+//       const file = files[0];
+//       const reader = new FileReader();
+//       reader.onload = function (e) {
+//         imagePreviewContainer.innerHTML = `<img id="imagePreview" src="${e.target.result}" style="max-width: 30%;">`;
+//         const image = document.getElementById("imagePreview");
+//         cropper = new Cropper(image, {
+//           aspectRatio: 1,
+//           viewMode: 3,
+//           autoCropArea: 1,
+//           responsive: true,
+//           zoomable: true,
+//         });
+//       };
+//       reader.readAsDataURL(file);
+//     }
+//   });
 
   function deleteSingleImage(productId, filename) {
     console.log('Product ID:', productId);
@@ -174,7 +181,6 @@
   }
 
   function AddProductvalidate() {
-    console.log('calling');
     const productName = document.getElementById("product_title");
     const regPrice = document.getElementById("product_regPrice");
     const salePrice = document.getElementById("product_salePrice");
@@ -187,7 +193,7 @@
     const descriptionError = document.getElementById("descError");
     const stockError = document.getElementById("stockError");
 
-    const productNameRegex = /^[a-zA-Z0-9\s]+$/;
+    const productNameRegex = /^[a-zA-Z\s]+$/;
     const regPriceRegex = /^\d+(\.\d{1,2})?$/;
     const salePriceRegex = /^\d+(\.\d{1,2})?$/;
     const descriptionRegex = /^[\p{L}\p{N}\s.,!?'"-/()]+$/u;
@@ -195,68 +201,68 @@
 
     let isValid = true;
 
+    // Validate product name
     if (productName.value.trim() === "") {
       productNameError.innerHTML = "Product name is required";
-      setTimeout(() => { productNameError.innerHTML = ""; }, 5000);
       isValid = false;
     } else if (!productNameRegex.test(productName.value)) {
       productNameError.innerHTML = "Invalid product name";
-      setTimeout(() => { productNameError.innerHTML = ""; }, 5000);
-      isValid = false;
-    }
-    else if (/\d/.test(productName.value)) {
-      productNameError.innerHTML = "Product name should not contain numbers";
-      setTimeout(() => { productNameError.innerHTML = ""; }, 5000);
       isValid = false;
     }
 
+    // Validate regular price
     if (regPrice.value.trim() === "") {
       regPriceError.innerHTML = "Regular price is required";
-      setTimeout(() => { regPriceError.innerHTML = ""; }, 5000);
       isValid = false;
     } else if (!regPriceRegex.test(regPrice.value)) {
       regPriceError.innerHTML = "Invalid regular price";
-      setTimeout(() => { regPriceError.innerHTML = ""; }, 5000);
       isValid = false;
     }
 
+    // Validate sale price
     if (salePrice.value.trim() === "") {
       salePriceError.innerHTML = "Sale price is required";
-      setTimeout(() => { salePriceError.innerHTML = ""; }, 5000);
       isValid = false;
     } else if (!salePriceRegex.test(salePrice.value)) {
       salePriceError.innerHTML = "Invalid sale price";
-      setTimeout(() => { salePriceError.innerHTML = ""; }, 5000);
       isValid = false;
     }
 
+    // Validate description
     if (description.value.trim() === "") {
       descriptionError.innerHTML = "Description is required";
-      setTimeout(() => { descriptionError.innerHTML = ""; }, 5000);
       isValid = false;
     } else if (!descriptionRegex.test(description.value)) {
-      descriptionError.innerHTML = "Only alphabets are allowed";
-      setTimeout(() => { descriptionError.innerHTML = ""; }, 5000);
+      descriptionError.innerHTML = "Invalid description";
       isValid = false;
     }
 
+    // Validate stock quantity
     if (stock.value.trim() === "") {
       stockError.innerHTML = "Stock quantity is required";
-      setTimeout(() => { stockError.innerHTML = ""; }, 5000);
       isValid = false;
     } else if (!stockRegex.test(stock.value)) {
       stockError.innerHTML = "Invalid stock quantity";
-      setTimeout(() => { stockError.innerHTML = ""; }, 5000);
       isValid = false;
     } else if (parseInt(stock.value) < 0) {
       stockError.innerHTML = "Stock quantity cannot be negative";
-      setTimeout(() => { stockError.innerHTML = ""; }, 5000);
       isValid = false;
     }
+
+    // Clear error messages after 5 seconds
+    setTimeout(() => {
+      productNameError.innerHTML = "";
+      regPriceError.innerHTML = "";
+      salePriceError.innerHTML = "";
+      descriptionError.innerHTML = "";
+      stockError.innerHTML = "";
+    }, 5000);
 
     return isValid;
   }
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
 
 
 <%- include("../layouts/admin/footer") %>
