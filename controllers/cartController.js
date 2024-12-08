@@ -37,7 +37,7 @@ const loadCart = async (req, res) => {
 
       
 
-        res.render("Add-to-cart", {
+        res.render("add-to-cart", {
             loggedIn,
             cartCount,
             cart,
