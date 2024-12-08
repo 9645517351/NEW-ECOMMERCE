@@ -160,12 +160,21 @@
                                                       </td>
                                                       <td><%= orderItem.payment %></td>
                                                       <td>₹<%= orderItem.totalPrice %></td>
+                                                      <td>₹<%= orderItem.totalPrice %></td>
                                                       <td>
-                                                        <a href="/view-order/<%= orderItem._id %>/<%= orderItem.products[0].productId._id %>" 
-                                                          class="btn btn-small <%= displayStatus === 'Failed' ? 'btn-outline-danger' : 'btn-outline-primary' %>">
-                                                          View
-                                                        </a>
+                                                        <% 
+                                                          const productId = orderItem.products?.[0]?.productId?._id || null;
+                                                          const btnClass = displayStatus === 'Failed' ? 'btn-outline-danger' : 'btn-outline-primary';
+                                                        %>
+                                                        <% if (productId) { %>
+                                                          <a href="/view-order/<%= orderItem._id %>/<%= productId %>" class="btn btn-small <%= btnClass %>">
+                                                            View
+                                                          </a>
+                                                        <% } else { %>
+                                                          <span class="text-danger">Invalid Product</span>
+                                                        <% } %>
                                                       </td>
+
                                                     </tr>
 
                                                 

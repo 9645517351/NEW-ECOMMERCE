@@ -90,52 +90,59 @@
             <div class="tab-content wow fadeIn animated" id="myTabContent">
                 <div class="tab-pane fade show active" id="tab-one" role="tabpanel" aria-labelledby="tab-one">
                     <div class="row product-grid-4">
-                        <% for( let i = 0; i < 8; i++ ) { %>
-                            <div class="col-lg-3 col-md-4 col-12 col-sm-6">
-                                <div class="product-cart-wrap mb-30">
-                                    <div class="product-img-action-wrap">
-                                        <div class="product-img product-img-zoom">
-                                            <a href="/products/product-details?id=<%= products[i]._id %>">
-                                                <img class="default-img" src="assets/uploads/<%= products[i].image[0].filename %>" alt="">
-                                                <img class="hover-img" src="assets/uploads/<%= products[i].image[1].filename %>" alt="">
-                                            </a>
-                                        </div>
-                                        <div class="product-action-1">
-                                            <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
-                                            <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addTowishlist('<%= products[i]._id %>')"><i class="fi-rs-heart"></i></a>
-                                            <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
-                                        </div>
-                                        <div class="product-badges product-badges-position product-badges-mrg">
-                                            
-                                        </div>
-                                    </div>
-                                    <div class="product-content-wrap">
-                                        <div class="product-category">
-                                            <a href="shop-grid-right.html">Furniture</a>
-                                        </div>
-                                        <h2><a href="shop-product-right.html"><%= products[i].productName %></a></h2>
-                                        
-                                        <div class="product-price">
-                                            <span>Rs :<%= products[i].salePrice %> </span>
-                                            <span class="old-price"><%= products[i].regularPrice %></span>
-                                        </div>
-                                        <div style="width: 50%;">
-                                            <label for="qty-<%= products[i]._id %>">Quantity:</label>
-                                            <input type="number" id="qty-<%= products[i]._id %>" name="quantity" min="1" value="1">
-                                        </div>
-                                        <div class="product-action-1 show">
-                                            <a aria-label="Add To Cart" class="action-btn hover-up" onclick="addToCartDetails('<%= products[i]._id %>')" href="javascript:void(0);" id="cart-icon-<%= products[i]._id %>">
-                                                <i class="fi-rs-shopping-bag-add"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    
-                                </div>
+                    <% for (let i = 0; i < Math.min(products.length, 8); i++) { %>
+                      <% if (products[i] && products[i]._id && products[i].image?.length > 1) { %>
+                        <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                          <div class="product-cart-wrap mb-30">
+                            <div class="product-img-action-wrap">
+                              <div class="product-img product-img-zoom">
+                                <a href="/products/product-details?id=<%= products[i]._id %>">
+                                  <img class="default-img" src="assets/uploads/<%= products[i].image[0].filename %>" alt="">
+                                  <img class="hover-img" src="assets/uploads/<%= products[i].image[1].filename %>" alt="">
+                                </a>
+                              </div>
+                              <div class="product-action-1">
+                                <a aria-label="Quick view" class="action-btn hover-up" data-bs-toggle="modal" data-bs-target="#quickViewModal"><i class="fi-rs-eye"></i></a>
+                                <a aria-label="Add To Wishlist" class="action-btn hover-up" onclick="addTowishlist('<%= products[i]._id %>')"><i class="fi-rs-heart"></i></a>
+                                <a aria-label="Compare" class="action-btn hover-up" href="shop-compare.html"><i class="fi-rs-shuffle"></i></a>
+                              </div>
+                              <div class="product-badges product-badges-position product-badges-mrg"></div>
                             </div>
-                        <% } %>
-                    </div>
-                    <!--End product-grid-4-->
+                            <div class="product-content-wrap">
+                              <div class="product-category">
+                                <a href="shop-grid-right.html">Furniture</a>
+                              </div>
+                              <h2><a href="shop-product-right.html"><%= products[i].productName %></a></h2>
+                              <div class="product-price">
+                                <span>Rs :<%= products[i].salePrice %></span>
+                                <span class="old-price"><%= products[i].regularPrice %></span>
+                              </div>
+                              <div style="width: 50%;">
+                                <label for="qty-<%= products[i]._id %>">Quantity:</label>
+                                <input type="number" id="qty-<%= products[i]._id %>" name="quantity" min="1" value="1">
+                              </div>
+                              <div class="product-action-1 show">
+                                <a aria-label="Add To Cart" class="action-btn hover-up" onclick="addToCartDetails('<%= products[i]._id %>')" href="javascript:void(0);" id="cart-icon-<%= products[i]._id %>">
+                                  <i class="fi-rs-shopping-bag-add"></i>
+                                </a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      <% } else { %>
+                        <div class="col-lg-3 col-md-4 col-12 col-sm-6">
+                          <div class="product-cart-wrap mb-30">
+                            <div class="product-content-wrap">
+                              <h4 class="text-danger">Product data is incomplete</h4>
+                            </div>
+                          </div>
+                        </div>
+                      <% } %>
+                    <% } %>
+                  </div>
                 </div>
+              </div>
+              
                
      
     <section class="popular-categories section-padding mt-15 mb-25">

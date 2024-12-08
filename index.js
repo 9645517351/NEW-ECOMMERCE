@@ -44,14 +44,14 @@ app.use((err, req, res, next) => {
     
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
         // Send JSON response for API requests
-        return res.status(statusCode).json({
+         res.status(statusCode).json({
             status: 'error',
             statusCode,
             message
         });
     } else {
         
-        return res.status(statusCode).render('error', {
+        res.status(statusCode).render('error', {
             statusCode,
             message,
             stack: process.env.NODE_ENV === 'development' ? err.stack : ''

@@ -302,30 +302,24 @@ const verifyLogin = async (req, res) => {
 
 const loadHome = async (req, res) => {
   try {
-    const user_id = req.session.user_id;
-    // const products = await Product.find({});
-    const categories = await Category.find({listed: true});
+    const categories = await Category.find({ listed: true });
     const listedCategoryIds = categories.map(cat => cat._id);
 
-    const wishlist = user_id
-      ? await Wishlist.find({ user_id: user_id })
-      : await Wishlist.find({ user_id: null });
-
-    // Send wishlist count as well
-    const wishlistCount = wishlist.length || 0;
-
-    
-
-    const cartCount = user_id
-      ? await Cart.countDocuments({ user_id : user_id})
-      : await Cart.countDocuments({ user_id : null })
-    
-
     const products = await Product.find({ category: { $in: listedCategoryIds } });
+    console.log("Fetched Products:", products); // Debugging
+
+    const wishlistCount = req.session.user_id
+      ? await Wishlist.countDocuments({ user_id: req.session.user_id })
+      : 0;
+
+    const cartCount = req.session.user_id
+      ? await Cart.countDocuments({ user_id: req.session.user_id })
+      : 0;
 
     res.render("home", { products, categories, wishlistCount, cartCount });
   } catch (error) {
-    console.log(error.message);
+    console.error("Error in loadHome:", error.message);
+    res.status(500).render("error", { message: "Unable to load homepage" });
   }
 };
 
